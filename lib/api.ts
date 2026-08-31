@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_MAIN_PLATFORM_API || 'http://localhost:9002/api/main-platform';
+const API_BASE_URL = process.env.NEXT_PUBLIC_MAIN_PLATFORM_API || '/api/proxy';
 
 export interface LessonItem {
   id: string;
