@@ -1,4 +1,15 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_MAIN_PLATFORM_API || '/api/proxy';
+function getApiBaseUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_MAIN_PLATFORM_API;
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    if (!envUrl || envUrl.startsWith('http://')) {
+      return '/api/proxy';
+    }
+  }
+  return envUrl || '/api/proxy';
+}
+
+const API_BASE_URL = getApiBaseUrl();
+
 
 export interface LessonItem {
   id: string;
@@ -155,6 +166,9 @@ export async function uploadImage(file: File): Promise<string> {
 
   // Convert relative backend path to absolute URL if needed
   if (data.url.startsWith('/uploads/')) {
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      return data.url;
+    }
     const backendOrigin = process.env.NEXT_PUBLIC_BACKEND_URL || API_BASE_URL.replace(/\/api\/main-platform\/?$/, '');
     return `${backendOrigin}${data.url}`;
   }
