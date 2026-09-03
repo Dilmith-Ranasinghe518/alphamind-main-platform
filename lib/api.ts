@@ -191,10 +191,30 @@ export async function importSubjectJsx(jsxContent: string, imageUrl?: string, ba
     }
   }
 
+  // Client-side evaluation to produce clean JSON structure
+  let parsedData: any = null;
+  try {
+    const evalCode = jsxContent.trim()
+      .replace(/^export\s+const\s+\w+\s*=/m, 'return')
+      .replace(/^export\s+default\s+/m, 'return')
+      .replace(/^(const|var|let)\s+\w+\s*=/m, 'return')
+      .replace(/;\s*$/, '');
+    parsedData = new Function(evalCode)();
+  } catch (e) {
+    console.warn('Client-side JS object parsing notice:', e);
+  }
+
   const res = await fetch(`${API_BASE_URL}/import-subject`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsxContent: processedJsx, rawJsxContent: jsxContent, imageUrl, badgeColor }),
+    body: JSON.stringify({
+      jsxContent: processedJsx,
+      rawJsxContent: jsxContent,
+      parsedData,
+      jsonContent: parsedData ? JSON.stringify(parsedData) : null,
+      imageUrl,
+      badgeColor
+    }),
   });
   const data = await res.json();
   if (!res.ok) {
