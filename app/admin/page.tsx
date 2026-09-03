@@ -8,6 +8,7 @@ import {
   fetchPageConfig,
   savePageConfig,
   uploadImage,
+  importSubjectJsx,
   PageConfig,
   PageSummary,
   PageSection,
@@ -86,11 +87,47 @@ export default function AdminPage() {
   const [isUploading, setIsUploading] = useState<boolean>(false);
 
   // JSX Import Modal State
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
   const [importJsxContent, setImportJsxContent] = useState<string>('');
+  const [importedFileName, setImportedFileName] = useState<string>('');
+  const [isDraggingFile, setIsDraggingFile] = useState<boolean>(false);
   const [importImageUrl, setImportImageUrl] = useState<string>('/images/Poster12.jpg');
   const [importBadgeColor, setImportBadgeColor] = useState<string>('#ec4899');
   const [isImporting, setIsImporting] = useState<boolean>(false);
+
+  const processFile = (file: File) => {
+    if (!file) return;
+    if (!file.name.endsWith('.jsx') && !file.name.endsWith('.js') && !file.name.endsWith('.txt')) {
+      alert('Please select a valid .jsx, .js, or .txt file.');
+      return;
+    }
+    setImportedFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result;
+      if (typeof text === 'string') {
+        setImportJsxContent(text);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleJsxFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files[0]) {
+      processFile(files[0]);
+    }
+  };
+
+  const handleFileDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDraggingFile(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
+
 
   // Check auth on load
   useEffect(() => {
@@ -386,25 +423,17 @@ export default function AdminPage() {
   // Import JSX Subject Action
   const handleImportSubjectJsx = async () => {
     if (!importJsxContent.trim()) {
-      alert('Please paste or upload JSX subject content code first.');
+      alert('Please select/upload a .jsx/.js file or paste the subject content code first.');
       return;
     }
     setIsImporting(true);
     try {
-      const res = await fetch('http://localhost:9002/api/main-platform/import-subject', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsxContent: importJsxContent,
-          imageUrl: importImageUrl,
-          badgeColor: importBadgeColor
-        })
-      });
-      const data = await res.json();
+      const data = await importSubjectJsx(importJsxContent, importImageUrl, importBadgeColor);
       if (data.success) {
         setSaveSuccessMsg(data.message || 'Subject imported successfully!');
         setIsImportModalOpen(false);
         setImportJsxContent('');
+        setImportedFileName('');
         loadPageConfig(selectedSlug);
         setTimeout(() => setSaveSuccessMsg(''), 4000);
       } else {
@@ -452,7 +481,7 @@ export default function AdminPage() {
   };
 
   // Upload handler for items or slides
-  const handleFileUpload = async (file: File, callback: (url: string) => void) => {
+  const handleImageFileUpload = async (file: File, callback: (url: string) => void) => {
     setIsUploading(true);
     try {
       const url = await uploadImage(file);
@@ -1000,7 +1029,7 @@ export default function AdminPage() {
                                   className="hidden"
                                   onChange={(e) => {
                                     if (e.target.files?.[0]) {
-                                      handleFileUpload(e.target.files[0], (url) => handleUpdateHeroSlide(slide.id, 'imageUrl', url));
+                                      handleImageFileUpload(e.target.files[0], (url) => handleUpdateHeroSlide(slide.id, 'imageUrl', url));
                                     }
                                   }}
                                 />
@@ -1210,7 +1239,7 @@ export default function AdminPage() {
                         className="hidden"
                         onChange={(e) => {
                           if (e.target.files?.[0]) {
-                            handleFileUpload(e.target.files[0], (url) =>
+                            handleImageFileUpload(e.target.files[0], (url) =>
                               setEditingItem({ ...editingItem, item: { ...editingItem.item, imageUrl: url } })
                             );
                           }
@@ -1352,14 +1381,64 @@ export default function AdminPage() {
             </div>
 
             <p className="text-xs text-slate-400">
-              Paste subject content JSX code (like <code className="text-amber-400">Catholicism7E.jsx</code>, <code className="text-amber-400">BharathaNatyam7T.jsx</code>, <code className="text-amber-400">BharathaNatyam7S.jsx</code>).
+              Upload a <code className="text-amber-400">.jsx</code> or <code className="text-amber-400">.js</code> file (like <code className="text-amber-400">Catholicism7E.jsx</code>, <code className="text-amber-400">BharathaNatyam7T.jsx</code>, <code className="text-amber-400">BharathaNatyam7S.jsx</code>), or paste the subject content code below.
             </p>
 
-            <div className="space-y-3 text-xs">
+            <div className="space-y-3.5 text-xs">
+              {/* FILE UPLOAD / DRAG & DROP ZONE */}
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">JSX Subject Code *</label>
+                <label className="block text-slate-300 font-semibold mb-1">Upload File (.jsx / .js)</label>
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDraggingFile(true); }}
+                  onDragLeave={() => setIsDraggingFile(false)}
+                  onDrop={handleFileDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-4 text-center transition cursor-pointer ${
+                    isDraggingFile
+                      ? 'border-indigo-500 bg-indigo-500/10'
+                      : 'border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 hover:bg-slate-950'
+                  }`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".jsx,.js,.txt"
+                    className="hidden"
+                    onChange={handleJsxFileUpload}
+                  />
+                  <CloudArrowUpIcon className="h-7 w-7 text-indigo-400 mb-1" />
+                  {importedFileName ? (
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-emerald-400">{importedFileName}</span>
+                      <span className="text-[10px] text-slate-400">({(importJsxContent.length / 1024).toFixed(1)} KB)</span>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="font-medium text-slate-300">
+                        Click to select or drag & drop your <span className="text-indigo-400 font-semibold">.jsx</span> / <span className="text-indigo-400 font-semibold">.js</span> file
+                      </p>
+                      <p className="text-[10px] text-slate-500 mt-0.5">Supports .jsx, .js, or .txt subject files</p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* JSX CONTENT TEXTAREA */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-slate-300 font-semibold">JSX Subject Code *</label>
+                  {importJsxContent && (
+                    <button
+                      type="button"
+                      onClick={() => { setImportJsxContent(''); setImportedFileName(''); }}
+                      className="text-[11px] text-rose-400 hover:underline cursor-pointer"
+                    >
+                      Clear Content
+                    </button>
+                  )}
+                </div>
                 <textarea
-                  rows={10}
+                  rows={8}
                   value={importJsxContent}
                   onChange={(e) => setImportJsxContent(e.target.value)}
                   placeholder="export const Catholicism7E = { 1: { title: 'Catholicism', chapters: [...] } };"

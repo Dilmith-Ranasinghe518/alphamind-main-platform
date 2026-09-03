@@ -174,3 +174,17 @@ export async function uploadImage(file: File): Promise<string> {
   }
   return data.url;
 }
+
+export async function importSubjectJsx(jsxContent: string, imageUrl?: string, badgeColor?: string) {
+  const res = await fetch(`${API_BASE_URL}/import-subject`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsxContent, imageUrl, badgeColor }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Import failed');
+  }
+  return data;
+}
+
