@@ -426,6 +426,19 @@ export default function AdminPage() {
       alert('Please select/upload a .jsx/.js file or paste the subject content code first.');
       return;
     }
+
+    // Pre-check for JS syntax errors
+    try {
+      const codeToTest = importJsxContent
+        .replace(/^export\s+const\s+\w+\s*=/m, 'var _testSubject =')
+        .replace(/^export\s+default\s+/, 'var _testSubject =');
+      new Function(codeToTest);
+    } catch (syntaxErr: any) {
+      if (!confirm(`Warning: JavaScript Syntax Error detected in file:\n"${syntaxErr.message}"\n\nDo you still want to attempt importing?`)) {
+        return;
+      }
+    }
+
     setIsImporting(true);
     try {
       const data = await importSubjectJsx(importJsxContent, importImageUrl, importBadgeColor);

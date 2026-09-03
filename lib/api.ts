@@ -176,10 +176,25 @@ export async function uploadImage(file: File): Promise<string> {
 }
 
 export async function importSubjectJsx(jsxContent: string, imageUrl?: string, badgeColor?: string) {
+  let processedJsx = jsxContent.trim();
+  const exportConstMatch = processedJsx.match(/^export\s+const\s+(\w+)\s*=/m);
+  if (exportConstMatch) {
+    const varName = exportConstMatch[1];
+    processedJsx = processedJsx.replace(/^export\s+const\s+/, 'const ');
+    if (!processedJsx.includes('module.exports')) {
+      processedJsx += `\nif (typeof module !== 'undefined') { module.exports = ${varName}; }`;
+    }
+  } else if (/^export\s+default/m.test(processedJsx)) {
+    processedJsx = processedJsx.replace(/^export\s+default\s+/, 'const _defaultExport = ');
+    if (!processedJsx.includes('module.exports')) {
+      processedJsx += `\nif (typeof module !== 'undefined') { module.exports = _defaultExport; }`;
+    }
+  }
+
   const res = await fetch(`${API_BASE_URL}/import-subject`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsxContent, imageUrl, badgeColor }),
+    body: JSON.stringify({ jsxContent: processedJsx, rawJsxContent: jsxContent, imageUrl, badgeColor }),
   });
   const data = await res.json();
   if (!res.ok) {
@@ -187,4 +202,5 @@ export async function importSubjectJsx(jsxContent: string, imageUrl?: string, ba
   }
   return data;
 }
+
 
