@@ -19,7 +19,7 @@ export default function SolutionsBar({ theme = 'light' }) {
 
   return (
     <div
-      className={`flex h-9 w-full flex-shrink-0 items-center gap-2 border-b px-4 text-xs font-medium sm:gap-3 sm:px-6 lg:px-8 ${wrapperClasses}`}
+      className={`hidden sm:flex h-9 w-full flex-shrink-0 items-center gap-2 border-b px-4 text-xs font-medium sm:gap-3 sm:px-6 lg:px-8 ${wrapperClasses}`}
     >
       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
         <span className={`font-semibold ${labelClasses}`}>Solutions for:</span>

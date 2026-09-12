@@ -125,8 +125,14 @@ export default function SubjectCarousel({
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="relative overflow-hidden rounded-[14px] bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] px-6 py-8 text-white shadow-[0_30px_60px_rgba(15,23,42,0.28)] sm:px-7 sm:py-9">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,255,255,0.05),transparent_22%)]" />
+    <section className="relative rounded-[14px] px-6 pt-8 pb-2 sm:px-7 sm:pt-9 sm:pb-4 text-white lg:bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] lg:shadow-[0_30px_60px_rgba(15,23,42,0.28)] lg:overflow-hidden">
+      {/* Mobile background element that covers only the top portion */}
+      <div className="absolute inset-x-0 top-0 h-[65%] rounded-[14px] bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] shadow-[0_20px_40px_rgba(15,23,42,0.28)] lg:hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,255,255,0.05),transparent_22%)] rounded-[14px]" />
+      </div>
+
+      {/* Desktop background shine */}
+      <div className="hidden lg:block pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,255,255,0.05),transparent_22%)]" />
 
       <div className="relative z-10 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(220px,0.82fr)_minmax(0,1.28fr)] lg:items-center">
         <div className="min-w-0 space-y-4 pr-2">
@@ -179,12 +185,13 @@ export default function SubjectCarousel({
             slidesPerView={1.4}
             breakpointsBase="container"
             breakpoints={{
-              300: { slidesPerView: 2.25, spaceBetween: 12 },
-              420: { slidesPerView: 3.5, spaceBetween: 12 },
+              0: { slidesPerView: 3.25, spaceBetween: 8 },
+              420: { slidesPerView: 3.25, spaceBetween: 12 },
+              640: { slidesPerView: 4, spaceBetween: 14 },
             }}
           >
             {items.map((item) => (
-              <SwiperSlide key={item.id} className="!h-auto">
+              <SwiperSlide key={item.id} className="!h-auto flex">
                 <SubjectCard
                   item={item}
                   isSelected={selectedSubjectId === item.id}
@@ -195,6 +202,12 @@ export default function SubjectCarousel({
           </Swiper>
         </div>
       </div>
+      <style jsx global>{`
+        .subject-specials-swiper .swiper-slide {
+          display: flex;
+          height: auto;
+        }
+      `}</style>
     </section>
   );
 }

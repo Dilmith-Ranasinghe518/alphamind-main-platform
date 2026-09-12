@@ -6,12 +6,14 @@ import { BookOpenIcon } from '@heroicons/react/24/solid';
 
 import MainHeader from '@/components/layout/MainHeader';
 import SolutionsBar from '@/components/layout/SolutionsBar';
+import MobileIconBar from '@/components/layout/MobileIconBar';
 import MainSidebar, { getMainSidebarWidth } from '@/components/layout/MainSidebar';
 import { getMainSidebarNavSections } from '@/components/layout/mainSidebarNav';
 import ContentsSidebar from '@/components/layout/ContentsSidebar';
 import HeroCarousel from '@/components/HeroCarousel';
 import SubjectCarousel from '@/components/SubjectCarousel';
 import Footer from '@/components/layout/Footer';
+import MobileContentsDropdown from '@/components/MobileContentsDropdown';
 import DynamicPageConfig from '@/components/DynamicPageConfig';
 import { fetchPageConfig, PageConfig, PageItem } from '@/lib/api';
 import { allCourses } from '@/Data/data';
@@ -155,10 +157,11 @@ export default function Home() {
           theme={theme}
           onToggleTheme={() => setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))}
         />
+        <MobileIconBar theme={theme} />
         <SolutionsBar theme={theme} />
       </div>
 
-      <div className="flex min-h-0 flex-1 overflow-hidden transition-[padding] duration-300 lg:pl-[var(--main-sidebar-width)]">
+      <div className="flex flex-col lg:flex-row min-h-0 flex-1 overflow-hidden transition-[padding] duration-300 lg:pl-[var(--main-sidebar-width)]">
         <MainSidebar
           navSections={navSections}
           isCollapsed={isNavCollapsed}
@@ -194,13 +197,20 @@ export default function Home() {
               <button
                 type="button"
                 onClick={openContents}
-                className={`inline-flex items-center gap-2 rounded-full bg-[#2f343d] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(15,23,42,0.18)] ${
+                className={`hidden lg:inline-flex items-center gap-2 rounded-full bg-[#2f343d] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(15,23,42,0.18)] ${
                   isContentsOpen ? 'lg:hidden' : ''
                 }`}
               >
                 <BookOpenIcon className="h-4 w-4" />
                 Open contents ({selectedSubjectItem?.title || 'Subject'})
               </button>
+
+              <MobileContentsDropdown
+                course={activeCourse}
+                currentLessonId={currentLessonId as any}
+                setCurrentLessonId={setCurrentLessonId as any}
+                isDark={isDark}
+              />
 
               <HeroCarousel />
 

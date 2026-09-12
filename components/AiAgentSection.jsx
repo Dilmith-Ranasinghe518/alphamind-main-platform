@@ -72,7 +72,8 @@ function ImageCarousel({
           1024: { slidesPerView: 5.15, spaceBetween: 18 },
         }
       : {
-          480: { slidesPerView: 3, spaceBetween: 16 },
+          0: { slidesPerView: 4, spaceBetween: 8 },
+          480: { slidesPerView: 4, spaceBetween: 10 },
           640: { slidesPerView: 4, spaceBetween: 18 },
           768: { slidesPerView: 5, spaceBetween: 20 },
           1024: { slidesPerView: 5, spaceBetween: 22 },
@@ -102,7 +103,7 @@ function ImageCarousel({
         // !overflow-visible (mobile overlap සඳහා) සහ flex stretch වීම වැලැක්වීම
         className={`liquid-swiper !px-0 !overflow-visible lg:!overflow-hidden ${isAppStore ? 'appstore-swiper' : ''}`}
         spaceBetween={isAppStore ? 12 : 16}
-        slidesPerView={isQCHome ? 1.2 : isAppStore ? 1.7 : 2.2}
+        slidesPerView={isQCHome ? 1.2 : isAppStore ? 1.7 : 4}
         grabCursor
         navigation={{
           nextEl: `.${nextClass}`,
@@ -119,15 +120,14 @@ function ImageCarousel({
           const title = image.title || `Poster ${imageId}`;
           return (
             // !w-auto (stretch වීම වැලැක්වීමට) සහ !flex (stretching issue එකට)
-            <SwiperSlide key={imageId} className={`!h-auto !w-auto !flex ${isQCHome ? 'lg:!w-[calc((100%_-_110px)/6)]' : ''}`}>
+            <SwiperSlide key={imageId} className={`!h-auto !flex ${isQCHome || isAppStore ? '!w-auto' : ''} ${isQCHome ? 'lg:!w-[calc((100%_-_110px)/6)]' : ''}`}>
               <Wrapper
                 type={canSelect ? 'button' : undefined}
                 onClick={canSelect ? () => onSelect(image) : undefined}
-                // !w-auto (stretching වැලැක්වීමට) සහ vertical margin -mt-24
                 className={`${
                   isQCHome || isAppStore
-                    ? `group h-full !w-auto text-left transition duration-500 hover:-translate-y-1 -mt-24 lg:mt-0 ${canSelect ? 'cursor-pointer' : ''}`
-                    : `${shellClasses} !w-auto text-left transition duration-500 hover:-translate-y-1 -mt-24 lg:mt-0 ${canSelect ? 'cursor-pointer' : ''}`
+                    ? `group h-full !w-auto text-left transition duration-500 hover:-translate-y-1 mt-0 ${canSelect ? 'cursor-pointer' : ''}`
+                    : `${shellClasses} w-full text-left transition duration-500 hover:-translate-y-1 mt-0 ${canSelect ? 'cursor-pointer' : ''}`
                 }`}
                 aria-label={canSelect ? `Open ${title}` : undefined}
               >
@@ -169,8 +169,7 @@ function ImageCarousel({
                   <>
                     <div className="absolute inset-0 rounded-[10px] backdrop-blur-2xl" />
                     <div className="absolute inset-0 overflow-hidden rounded-[10px]">
-                      {/* !w-auto (stretch issue fix) */}
-                      <img src={image.src} alt={title} className="h-full !w-auto object-cover" />
+                      <img src={image.src} alt={title} className="h-full w-full object-cover" />
                       <div className={`pointer-events-none absolute inset-0 bg-gradient-to-t ${overlayGradient}`} />
                       <div className="pointer-events-none absolute inset-0 bg-white/5 blur-3xl opacity-50" />
                     </div>
@@ -221,13 +220,32 @@ export default function AiAgentSection({ carouselItems = defaultImages, theme = 
   const router = useRouter();
 
   return (
-    <div className="w-full flex flex-col items-center py-6 lg:py-10 bg-zinc-200 px-0 sm:px-8 rounded-2xl overflow-hidden">
+    <div className="w-full flex flex-col items-center py-6 lg:py-10 bg-zinc-200 px-3 sm:px-8 rounded-2xl overflow-hidden">
       
       {/* 1. Guarantee Banner Area */}
-      {/* Mobile එකේදී PB-20 යොදා Cards overlap එක සඳහා ඉඩ සලසා ඇත */}
-      <div className="flex items-center w-full max-w-[92vw] lg:max-w-[62vw] rounded-[20px] lg:rounded-[25px] bg-white px-6 py-8 pb-20 lg:pb-14 sm:px-10 lg:px-20 lg:py-14 text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
-        <div className="grid gap-6 lg:gap-12 w-full lg:grid-cols-[1.2fr_1fr] lg:items-start">
-          
+      <div className="flex items-center w-full lg:max-w-[62vw] rounded-[20px] lg:rounded-[25px] bg-white px-6 py-8 pb-8 lg:pb-14 sm:px-10 lg:px-20 lg:py-14 text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
+        
+        {/* Mobile View Content (< lg) */}
+        <div className="flex flex-col items-start space-y-4 w-full lg:hidden">
+          <h3 className="text-[24px] sm:text-[28px] font-bold leading-[1.2] tracking-[-0.02em] text-slate-950">
+            learn-with-your-ai agent
+            <br />
+            accurately
+          </h3>
+          <p className="text-[13px] leading-[1.6] text-slate-600 max-w-[340px]">
+            Quantum Mind is an innovative AI-powered education platform dedicated to transforming the way students learn, practice, and succeed.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push('/qchome/qchomepage1')}
+            className="mt-2 inline-flex items-center justify-center rounded-full bg-[#f98b11] px-7 py-3.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-[0_4px_14px_rgba(249,139,17,0.35)] transition hover:bg-[#e07b0a] active:scale-[0.98]"
+          >
+            EXPLORE ALL PROGRAMMES
+          </button>
+        </div>
+
+        {/* Desktop View Content (lg:) - UNTOUCHED */}
+        <div className="hidden lg:grid gap-6 lg:gap-12 w-full lg:grid-cols-[1.2fr_1fr] lg:items-start">
           {/* Header Side */}
           <div className="space-y-4 lg:space-y-6">
             <h3 className="text-[26px] sm:text-[32px] lg:text-[40px] font-light leading-[1.15] tracking-[-0.03em] lg:tracking-[-0.04em] text-slate-900">
@@ -251,14 +269,12 @@ export default function AiAgentSection({ carouselItems = defaultImages, theme = 
               <span className="whitespace-nowrap text-center">Explore all programs</span>
             </button>
           </div>
-
         </div>
+
       </div>
 
       {/* 2. Image Carousel Segment */}
-      {/* Mobile එකේදී -mt-16 (negative margin) මඟින් cards overlap වී ඇත */}
-      <div className="w-full relative z-10 -mt-16 lg:mt-10 px-4 sm:px-0">
-        {/* Card Height mobile එකේදී h-[320px] සීමා කර ඇදීම fix කර ඇත */}
+      <div className="w-full relative z-10 mt-6 lg:mt-10 px-4 sm:px-0">
         <ImageCarousel items={carouselItems} theme={theme} variant={variant} cardHeightClass="h-[320px]" />
       </div>
 

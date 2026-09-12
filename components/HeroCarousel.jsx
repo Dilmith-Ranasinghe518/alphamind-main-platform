@@ -47,24 +47,23 @@ const defaultItems = [
 
 function HeroSlideCard({ item }) {
   return (
-
-    <article className="mt-10 group relative h-full min-h-[312px] w-full overflow-hidden rounded-[10px] rounded-b-2xl[10px] bg-black/15 shadow-[0_20px_40px_rgba(0,0,0,0.24)] ring-1 ring-white/10">
+    <article className="mt-4 sm:mt-10 group relative h-full w-full aspect-[2/3] overflow-hidden rounded-[10px] bg-black/15 shadow-[0_20px_40px_rgba(0,0,0,0.24)] ring-1 ring-white/10">
       <img
         src={item.src}
         alt={item.title}
         className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
       />
-      <div className="absolute inset-0 rounded-[18px] bg-[linear-gradient(180deg,rgba(8,8,12,0)_0%,rgba(8,8,12,0.06)_42%,rgba(11,10,18,0.36)_62%,rgba(10,10,16,0.72)_80%,rgba(8,8,12,0.96)_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-[32%] rounded-b-[18px] bg-[linear-gradient(180deg,rgba(54,38,83,0)_0%,rgba(54,38,83,0.1)_30%,rgba(18,14,28,0.4)_68%,rgba(8,8,12,0.72)_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 flex min-h-[122px] flex-col justify-end rounded-b-[18px] px-3 pb-12 pt-8">
-        <p className="line-clamp-2 min-h-[32px] text-sm font-medium leading-4 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.72)]">
+      <div className="absolute inset-0 rounded-[10px] bg-[linear-gradient(180deg,rgba(8,8,12,0)_0%,rgba(8,8,12,0.06)_42%,rgba(11,10,18,0.36)_62%,rgba(10,10,16,0.72)_80%,rgba(8,8,12,0.96)_100%)]" />
+      <div className="absolute inset-x-0 bottom-0 h-[40%] rounded-b-[10px] bg-[linear-gradient(180deg,rgba(54,38,83,0)_0%,rgba(54,38,83,0.1)_30%,rgba(18,14,28,0.4)_68%,rgba(8,8,12,0.72)_100%)]" />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end rounded-b-[10px] p-2 pb-4 sm:px-3 sm:pb-12 sm:pt-8">
+        <p className="line-clamp-2 text-[10px] sm:text-sm font-medium leading-snug text-white drop-shadow-md">
           {item.title}
         </p>
-        <div className="mt-1 flex flex-col items-end gap-1.5">
-          <div className="inline-flex max-w-full truncate rounded-[3px] bg-[#d9ff3f] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.06em] text-slate-950 shadow-[0_8px_18px_rgba(217,255,63,0.28)]">
+        <div className="mt-1 flex flex-col items-start sm:items-end gap-1 sm:gap-1.5">
+          <div className="inline-flex max-w-full truncate rounded-[3px] bg-[#d9ff3f] px-1 sm:px-2 py-0.5 sm:py-1 text-[8px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-sm">
             {item.badge}
           </div>
-          <p className="text-right text-xs text-white/82 drop-shadow-[0_2px_6px_rgba(0,0,0,0.72)]">{item.price}</p>
+          <p className="text-left sm:text-right text-[8px] sm:text-xs text-white/80 drop-shadow-md">{item.price}</p>
         </div>
       </div>
     </article>
@@ -121,8 +120,14 @@ export default function HeroCarousel({ items = defaultItems }) {
   }, [syncSwiper]);
 
   return (
-    <section className="relative overflow-hidden rounded-[10px] bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] px-6 py-8 text-white shadow-[0_30px_60px_rgba(15,23,42,0.28)] sm:px-7 sm:py-9">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,255,255,0.05),transparent_22%)]" />
+    <section className="relative rounded-[10px] px-6 pt-8 pb-2 sm:px-7 sm:pt-9 sm:pb-4 text-white lg:bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] lg:shadow-[0_30px_60px_rgba(15,23,42,0.28)] lg:overflow-hidden">
+      {/* Mobile background element that covers only the top portion */}
+      <div className="absolute inset-x-0 top-0 h-[65%] rounded-[10px] bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] shadow-[0_20px_40px_rgba(15,23,42,0.28)] lg:hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,255,255,0.05),transparent_22%)] rounded-[10px]" />
+      </div>
+
+      {/* Desktop background shine */}
+      <div className="hidden lg:block pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,255,255,0.05),transparent_22%)]" />
 
       <div className="relative z-10 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(220px,0.82fr)_minmax(0,1.28fr)] lg:items-center">
         <div className="min-w-0 space-y-4 pr-2">
@@ -178,12 +183,13 @@ export default function HeroCarousel({ items = defaultItems }) {
                දෙක නිසා window එක 1440 උනත් මේ column එක 520px විතරයි. */
             breakpointsBase="container"
             breakpoints={{
-              300: { slidesPerView: 2.25, spaceBetween: 12 },
-              420: { slidesPerView: 4, spaceBetween: 12 },
+              0: { slidesPerView: 3.25, spaceBetween: 8 },
+              420: { slidesPerView: 3.25, spaceBetween: 12 },
+              640: { slidesPerView: 4, spaceBetween: 14 },
             }}
           >
             {items.map((item) => (
-              <SwiperSlide key={item.id} className="!h-auto">
+              <SwiperSlide key={item.id} className="!h-auto flex">
                 <HeroSlideCard item={item} />
               </SwiperSlide>
             ))}

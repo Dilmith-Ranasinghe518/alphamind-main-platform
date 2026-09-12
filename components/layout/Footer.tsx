@@ -4,10 +4,10 @@ import React from 'react';
 
 export default function Footer() {
   return (
-    <footer className="relative w-full bg-[#0D0D0E] text-neutral-400 font-sans pt-32 pb-6 px-4 md:px-8 mt-90">
+    <footer className="relative w-full bg-[#0D0D0E] text-neutral-400 font-sans pt-8 md:pt-40 pb-6 px-4 md:px-8 mt-16 md:mt-40">
       
       {/* 1. 🤍 TOP FLOATING CARD (Accelerate Your Impact) */}
-      <div className="absolute -top-30 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-32px)] max-w-5xl bg-white text-zinc-950 rounded-[24px] p-8 md:p-12 text-center shadow-2xl border border-neutral-200/50">
+      <div className="relative md:absolute md:top-0 left-1/2 -translate-x-1/2 md:-translate-y-1/2 w-[calc(100%-16px)] md:w-[calc(100%-64px)] max-w-5xl bg-white text-zinc-950 rounded-[24px] p-6 md:p-12 text-center shadow-2xl border border-neutral-200/50 -mt-20 md:mt-0 mb-12 md:mb-0">
         <h3 className="font-bold text-2xl md:text-5xl font-extrabold tracking-tight mb-3 text-zinc-900">
           Accelerate Your Impact, <br/> 
           Become a Sponsor!

@@ -15,6 +15,7 @@ import FAQSection from '@/components/FAQSection';
 import JobSearchBanner from '@/components/JobSearchBanner';
 import JobCard from '@/components/JobCard';
 import Footer from '@/components/layout/Footer';
+import MobileContentsDropdown from '@/components/MobileContentsDropdown';
 import { allCourses } from '@/Data/data';
 import PageCarousel from '@/components/PageCarousel';
 
@@ -102,7 +103,7 @@ export default function Research() {
         <SolutionsBar theme={theme} />
       </div>
 
-      <div className="flex min-h-0 flex-1 overflow-hidden transition-[padding] duration-300 lg:pl-[var(--main-sidebar-width)]">
+      <div className="flex flex-col lg:flex-row min-h-0 flex-1 overflow-hidden transition-[padding] duration-300 lg:pl-[var(--main-sidebar-width)]">
         <MainSidebar
           navSections={navSections}
           isCollapsed={isNavCollapsed}
@@ -138,13 +139,20 @@ export default function Research() {
               <button
                 type="button"
                 onClick={openContents}
-                className={`inline-flex items-center gap-2 rounded-full bg-[#2f343d] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(15,23,42,0.18)] ${
+                className={`hidden lg:inline-flex items-center gap-2 rounded-full bg-[#2f343d] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(15,23,42,0.18)] ${
                   isContentsOpen ? 'lg:hidden' : ''
                 }`}
               >
                 <BookOpenIcon className="h-4 w-4" />
                 Open contents
               </button>
+
+              <MobileContentsDropdown
+                course={course}
+                currentLessonId={currentLessonId as any}
+                setCurrentLessonId={setCurrentLessonId as any}
+                isDark={isDark}
+              />
 
               <HeroCarousel />
 

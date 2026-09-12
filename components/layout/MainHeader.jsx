@@ -51,7 +51,7 @@ export default function MainHeader({ onOpenMobileNav, theme = 'dark', onToggleTh
 
         {/* Logo Section */}
         <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#0a66c2] text-sm font-bold uppercase text-white shadow-md">
+          <div className="hidden sm:flex h-6 w-6 items-center justify-center rounded-md bg-[#0a66c2] text-sm font-bold uppercase text-white shadow-md">
             in
           </div>
           <span className={`text-xl font-bold tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>

@@ -46,10 +46,9 @@ export default function MainSidebar({
     : 'rounded-full p-2 text-gray-600 transition-colors duration-200 hover:bg-gray-900/5';
   return (
     <aside
-      className={`hidden flex-shrink-0 flex-col border-r transition-all duration-300 lg:fixed lg:left-0 lg:top-[5.75rem] lg:z-30 lg:flex lg:h-[calc(100vh-5.75rem)] lg:overflow-y-auto ${sidebarClasses}`}
-      style={{ width: sidebarWidth }}
+      className={`flex w-full flex-shrink-0 flex-row items-center border-b lg:border-b-0 overflow-x-auto scrollbar-none transition-all duration-300 lg:fixed lg:left-0 lg:top-[5.75rem] lg:z-30 lg:flex-col lg:h-[calc(100vh-5.75rem)] lg:w-[var(--main-sidebar-width)] lg:overflow-y-auto lg:overflow-x-hidden lg:border-r ${sidebarClasses}`}
     >
-      <div className={`flex px-3 py-4 ${isCollapsed ? 'justify-center' : 'justify-end'}`}>
+      <div className={`hidden lg:flex px-3 py-4 ${isCollapsed ? 'justify-center' : 'justify-end'}`}>
         <button
           type="button"
           onClick={handleToggleCollapse}

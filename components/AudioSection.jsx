@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { StarIcon } from '@heroicons/react/24/solid'; // 👈 StarIcon එක සඳහා Heroicons පාවිච්චි කර ඇත
 
@@ -12,6 +12,8 @@ import { StarIcon } from '@heroicons/react/24/solid'; // 👈 StarIcon එක �
 // ];
 
 export default function AudioSection({ movieShelf }) {
+  const [activeMobileIndex, setActiveMobileIndex] = useState(0);
+
   const defaultMovies = React.useMemo(
     () => [
       { title: 'Poster 1', image: '/images/Poster1.jpg', featured: true },
@@ -25,17 +27,29 @@ export default function AudioSection({ movieShelf }) {
   );
   const movies = movieShelf ?? defaultMovies;
 
+  const handleScroll = (e) => {
+    const container = e.currentTarget;
+    const cardWidthWithGap = 122; // 110px width + 12px gap
+    const index = Math.min(
+      movies.length - 1,
+      Math.max(0, Math.round(container.scrollLeft / cardWidthWithGap))
+    );
+    if (index !== activeMobileIndex) {
+      setActiveMobileIndex(index);
+    }
+  };
+
   return (
-    <section className="overflow-hidden rounded-[8px] border border-black/10 bg-white shadow-[0_18px_36px_rgba(15,23,42,0.08)] mr-5 mb-5">
+    <section className="flex flex-col sm:block overflow-hidden rounded-[8px] border border-black/10 bg-white shadow-[0_18px_36px_rgba(15,23,42,0.08)] mr-0 sm:mr-5 mb-5">
       
       {/* Navigation / Header Row */}
-      <div className="flex flex-wrap items-center gap-4 px-20 py-10 sm:px-15">
+      <div className="order-1 flex flex-wrap items-center gap-4 px-6 py-6 sm:px-15 sm:py-10">
         <div className="flex items-center gap-2 text-[#272a39]">
           <span className="inline-block h-2 w-0 border-y-[7px] border-l-[11px] border-y-transparent border-l-[#7a72ea]" />
           <span className="text-[2rem] tracking-[-0.03em]">zuva</span>
         </div>
 
-        <nav className="mx-auto flex items-center gap-5 text-[15px] font-semibold uppercase tracking-[0.32em] text-[#3b3f50] sm:gap-8 sm:text-[15px]">
+        <nav className="mx-auto hidden sm:flex items-center gap-5 text-[15px] font-semibold uppercase tracking-[0.32em] text-[#3b3f50] sm:gap-8 sm:text-[15px]">
           <a href="#">Home</a>
           <a href="#" className="text-[#7a72ea]">
             Movies
@@ -57,33 +71,38 @@ export default function AudioSection({ movieShelf }) {
       </div>
 
       {/* Horizontal Movie Slider */}
-      <div className="flex gap-5 overflow-x-auto px-5 pb-6 pt-1 sm:gap-6 sm:px-6">
-        {movies.map((movie, index) => (
-          <article
-            key={`${movie.title}-${index}`} // Duplicate keys වළක්වා ගැනීමට index එක එකතු කර ඇත
-            className={`relative shrink-0 overflow-hidden rounded-[15px] bg-[#edf1f5] shadow-[0_24px_40px_rgba(15,23,42,0.16)] ring-1 ring-black/5 ${
-              movie.featured
-                ? 'h-[390px] w-[268px] sm:h-[400px] sm:w-[250px]'
-                : 'h-[390px] w-[268px] sm:h-[400px] sm:w-[250px]'
-            }`}
-          >
-            {/* Next.js <Image /> component එක නිවැරදිව fill property එක සහිතව */}
-            <Image
-              src={movie.image}
-              alt={movie.title}
-              fill
-              sizes="(max-width: 640px) 268px, 250px"
-              className="object-cover"
-            />
-          </article>
-        ))}
+      <div
+        onScroll={handleScroll}
+        className="order-2 flex w-full min-w-0 items-center gap-3 overflow-x-auto px-4 pb-5 pt-2 sm:gap-5 sm:pb-6 sm:pt-1 sm:px-6 scroll-smooth"
+      >
+        {movies.map((movie, index) => {
+          const isFirstInMobileView = index === activeMobileIndex;
+          return (
+            <article
+              key={`${movie.title}-${index}`}
+              className={`relative shrink-0 overflow-hidden rounded-[15px] bg-[#edf1f5] shadow-[0_24px_40px_rgba(15,23,42,0.16)] ring-1 ring-black/5 transition-all duration-300 ${
+                isFirstInMobileView
+                  ? 'h-[260px] w-[165px] min-w-[165px] sm:h-[400px] sm:w-[250px] sm:min-w-[250px]'
+                  : 'h-[200px] w-[110px] min-w-[110px] sm:h-[400px] sm:w-[250px] sm:min-w-[250px]'
+              }`}
+            >
+              <Image
+                src={movie.image}
+                alt={movie.title}
+                fill
+                sizes="(max-width: 640px) 220px, 250px"
+                className="object-cover"
+              />
+            </article>
+          );
+        })}
       </div>
 
       {/* Spotlight / Footer Info Section */}
-      <div className="px-4 pb-5 sm:px-6 sm:pb-6">
-        <div className="flex flex-col gap-4 rounded-[24px] bg-[#fbfbfd] px-5 py-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_24px_rgba(15,23,42,0.05)] sm:flex-row sm:items-center sm:justify-between sm:px-7">
-          <div className="max-w-[560px]">
-            <h2 className="text-[1.15rem] font-semibold text-[#2f3344] sm:text-[2rem] sm:tracking-[-0.04em]">
+      <div className="order-3 px-4 pb-6 pt-2 sm:px-6 sm:pb-6 sm:pt-0">
+        <div className="flex flex-col items-center text-center gap-6 rounded-[24px] bg-[#fbfbfd] px-5 py-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_24px_rgba(15,23,42,0.05)] sm:gap-4 sm:py-10 sm:flex-row sm:items-center sm:text-left sm:justify-between sm:px-7">
+          <div className="max-w-[560px] flex flex-col items-center sm:block">
+            <h2 className="text-[1.5rem] font-semibold text-[#2f3344] sm:text-[2rem] sm:tracking-[-0.04em]">
               Megamind
             </h2>
             <div className="mt-2 flex items-center gap-1">
@@ -94,7 +113,7 @@ export default function AudioSection({ movieShelf }) {
                 />
               ))}
             </div>
-            <p className="mt-3 max-w-[520px] text-sm leading-6 text-[#767b8d]">
+            <p className="mt-4 max-w-[520px] text-sm leading-6 text-[#767b8d] sm:mt-3">
               The supervillain Megamind finally defeats his nemesis, the superhero
               Metro Man. But without a hero, he loses all purpose and must find new
               meaning.
@@ -103,9 +122,9 @@ export default function AudioSection({ movieShelf }) {
 
           <button
             type="button"
-            className="inline-flex items-center gap-4 self-start rounded-full px-1 py-1 text-lg font-medium text-[#303447] sm:self-center"
+            className="inline-flex items-center gap-4 self-center rounded-full px-1 py-1 text-lg font-medium text-[#303447] sm:self-center"
           >
-            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#7268e9] text-white shadow-[0_18px_28px_rgba(114,104,233,0.34)]">
+            <span className="inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#7268e9] text-white shadow-[0_18px_28px_rgba(114,104,233,0.34)] sm:shrink">
               <svg viewBox="0 0 24 24" className="ml-1 h-6 w-6 fill-current">
                 <path d="M8 5.5v13l10-6.5-10-6.5Z" />
               </svg>

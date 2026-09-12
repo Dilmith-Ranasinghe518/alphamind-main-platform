@@ -81,8 +81,9 @@ export default function RevisionCard({ lessons = [] }) {
               loop
               grabCursor
               spaceBetween={16}
-              slidesPerView={1.1}
+              slidesPerView={1}
               breakpoints={{
+                0: { slidesPerView: 1, spaceBetween: 14 },
                 640: { slidesPerView: 1.6, spaceBetween: 18 },
                 900: { slidesPerView: 2.2, spaceBetween: 20 },
                 1180: { slidesPerView: 3, spaceBetween: 24 },
@@ -90,8 +91,40 @@ export default function RevisionCard({ lessons = [] }) {
             >
               {programCards.map((lesson) => (
                 <SwiperSlide key={lesson.id} className="!h-auto py-2">
+                  {/* Mobile View Card (< sm) */}
+                  <article className="sm:hidden mx-auto w-full max-w-[320px] overflow-hidden rounded-[20px] border border-zinc-800 bg-black p-5 flex flex-col items-center text-center shadow-2xl space-y-4">
+                    <div className="relative h-[180px] w-full overflow-hidden rounded-[14px]">
+                      <img
+                        src={lesson.image}
+                        alt={lesson.title}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="flex flex-col items-center space-y-2 pt-1">
+                      <h3 className="text-[20px] font-bold text-white leading-tight">
+                        Science development programme
+                      </h3>
+                      <p className="text-[12px] text-white/70 font-medium">
+                        300+ students reviews
+                      </p>
+                      <p className="text-[11px] leading-[1.65] text-white/65 max-w-[275px]">
+                        Quantum Mind is an innovative AI-powered education platform dedicated to transforming the way students learn, practice, and succeed. Designed for the Sri Lankan syllabus, it offers intelligent learning support, interactive exams, personalized guidance,
+                      </p>
+                      <div className="pt-3 w-full flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => router.push('/courses')}
+                          className="w-full max-w-[220px] py-3 rounded-lg border-2 border-[#fa9418] bg-transparent text-[11px] font-bold uppercase tracking-wider text-white transition hover:bg-[#fa9418]/10 active:scale-[0.98]"
+                        >
+                          LEARN MORE
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+
+                  {/* Desktop View Card (sm:) - UNTOUCHED */}
                   <article
-                    className="group mx-auto w-full max-w-[270px] min-h-[420px] overflow-hidden rounded-[18px] border border-[#363636] bg-[linear-gradient(180deg,#242424_0%,#1b1b1d_100%)] shadow-[0_18px_40px_rgba(0,0,0,0.34)] transition duration-300 hover:-translate-y-1"
+                    className="hidden sm:block group mx-auto w-full max-w-[270px] min-h-[420px] overflow-hidden rounded-[18px] border border-[#363636] bg-[linear-gradient(180deg,#242424_0%,#1b1b1d_100%)] shadow-[0_18px_40px_rgba(0,0,0,0.34)] transition duration-300 hover:-translate-y-1"
                   >
                     <div className="relative h-[200px] overflow-hidden">
                       <img

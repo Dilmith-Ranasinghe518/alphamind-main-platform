@@ -1,7 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
 const defaultPromoItems = [
   {
@@ -55,9 +57,7 @@ function CarouselCard({ item, accent = 'amber' }) {
       : 'bg-[#e8ff36] text-slate-950 shadow-[0_10px_18px_rgba(232,255,54,0.28)]';
 
   return (
-    // Mobile වලදී කාඩ්පත කැපී නොපෙනී snap වීමට 'snap-center' හෝ 'snap-start' එක් කර ඇත
-    <article className="group relative min-h-[365px] overflow-hidden rounded-[10px] bg-slate-900 shadow-[0_16px_30px_rgba(15,23,42,0.18)] ring-1 ring-black/10 flex-shrink-0 snap-start
-                        w-[70vw] sm:w-[calc((100%-24px)/3)] md:w-[calc((100%-36px)/4)] lg:w-[calc((100%-48px)/5)]">
+    <article className="group relative aspect-[2/3] h-full w-full overflow-hidden rounded-[10px] bg-slate-900 shadow-[0_16px_30px_rgba(15,23,42,0.18)] ring-1 ring-black/10">
       <Image
         src={item.src}
         alt={item.title}
@@ -83,17 +83,77 @@ export default function PageCarousel({
   accent = 'amber',
   items = defaultPromoItems,
 }) {
+  const swiperRef = useRef(null);
+  const containerRef = useRef(null);
+  const lastWidthRef = useRef(0);
+
+  const syncSwiper = useCallback(() => {
+    const swiper = swiperRef.current;
+    if (!swiper || swiper.destroyed || !swiper.el || swiper.el.offsetWidth === 0) return;
+    swiper.setBreakpoint();
+    swiper.update();
+  }, []);
+
+  useEffect(() => {
+    syncSwiper();
+
+    const frame = requestAnimationFrame(syncSwiper);
+    const node = containerRef.current;
+
+    if (!node || typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', syncSwiper);
+      return () => {
+        cancelAnimationFrame(frame);
+        window.removeEventListener('resize', syncSwiper);
+      };
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      const width = Math.round(entries[0].contentRect.width);
+      if (width === 0 || width === lastWidthRef.current) return;
+      lastWidthRef.current = width;
+      syncSwiper();
+    });
+    observer.observe(node);
+    window.addEventListener('resize', syncSwiper);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener('resize', syncSwiper);
+    };
+  }, [syncSwiper]);
+
   return (
-    <div className="w-full py-4 overflow-hidden">
-      {/* 🔄 Horizontal Scrollable Track */}
-      <div 
-        className="flex gap-3 overflow-x-auto pb-4 pt-1 scroll-smooth snap-x snap-mandatory scrollbar-none"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    <div ref={containerRef} className="w-full py-4 overflow-hidden relative">
+      <Swiper
+        className="page-carousel-swiper overflow-visible sm:overflow-hidden"
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+        }}
+        loop
+        spaceBetween={8}
+        slidesPerView={3.25}
+        breakpointsBase="container"
+        breakpoints={{
+          0: { slidesPerView: 3.25, spaceBetween: 8 },
+          420: { slidesPerView: 3.25, spaceBetween: 12 },
+          640: { slidesPerView: 4, spaceBetween: 14 },
+          768: { slidesPerView: 5, spaceBetween: 16 },
+        }}
       >
         {items.map((item) => (
-          <CarouselCard key={item.id} item={item} accent={accent} />
+          <SwiperSlide key={item.id} className="!h-auto flex">
+            <CarouselCard item={item} accent={accent} />
+          </SwiperSlide>
         ))}
-      </div>
+      </Swiper>
+      <style jsx global>{`
+        .page-carousel-swiper .swiper-slide {
+          height: auto;
+          display: flex;
+        }
+      `}</style>
     </div>
   );
 }

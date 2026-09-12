@@ -16,9 +16,11 @@ import ContentsSidebar from '@/components/layout/ContentsSidebar';
 import WeeklySpecialsCarousel from '@/components/WeeklySpecialsCarousel';
 import PageCarousel from '@/components/PageCarousel';
 import Footer from '@/components/layout/Footer';
+import MobileContentsDropdown from '@/components/MobileContentsDropdown';
 import { allCourses } from '@/Data/data';
 
-export default function Courses({ courseId = 1 }: { courseId?: number }) {
+export default function Courses() {
+  const courseId = 1;
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -131,7 +133,7 @@ export default function Courses({ courseId = 1 }: { courseId?: number }) {
         <SolutionsBar theme={theme} />
       </div>
 
-      <div className="flex min-h-0 flex-1 overflow-hidden transition-[padding] duration-300 lg:pl-[var(--main-sidebar-width)]">
+      <div className="flex flex-col lg:flex-row min-h-0 flex-1 overflow-hidden transition-[padding] duration-300 lg:pl-[var(--main-sidebar-width)]">
         <MainSidebar
           navSections={navSections}
           isCollapsed={isNavCollapsed}
@@ -167,8 +169,8 @@ export default function Courses({ courseId = 1 }: { courseId?: number }) {
               <button
                 type="button"
                 onClick={openContents}
-                className={`inline-flex items-center gap-2 rounded-full bg-[#2f343d] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(15,23,42,0.18)] ${
-                  isContentsOpen ? 'lg:hidden' : ''
+                className={`items-center gap-2 rounded-full bg-[#2f343d] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(15,23,42,0.18)] ${
+                  isContentsOpen ? 'hidden' : 'hidden lg:inline-flex'
                 }`}
               >
                 <BookOpenIcon className="h-4 w-4" />
@@ -177,6 +179,14 @@ export default function Courses({ courseId = 1 }: { courseId?: number }) {
 
               {/* <HeroCarousel /> */}
               <WeeklySpecialsCarousel />
+
+              <MobileContentsDropdown
+                course={course}
+                currentLessonId={currentLessonId}
+                setCurrentLessonId={setCurrentLessonId}
+                isDark={isDark}
+              />
+
               <PageCarousel />
               <section className="space-y-10 md:pt-2">
                 <div className="grid gap-6 md:grid-cols-2 lg:gap-10">
