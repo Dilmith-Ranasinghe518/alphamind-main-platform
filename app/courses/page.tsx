@@ -91,10 +91,14 @@ export default function Courses() {
         lesson.description ||
         'Build practical skills with concise guidance and a lesson path you can finish in one sitting.',
       image: lesson.studyMaterials?.[0] || fallbackImages[index % fallbackImages.length],
-      badge: index % 2 === 0 ? 'Best seller' : 'New',
-      learners: `${(133854 + index * 2187).toLocaleString('en-US')}`,
-      rating: `${95 - index}% (${(2.65 - index * 0.11).toFixed(2)}K)`,
-      pill: 'Free with Plus',
+      badge: index % 2 === 0 ? 'BEST SELLER' : 'NEW',
+      category: index % 2 === 0 ? 'DOMESTIKA SPECIALIZATION · 18H' : 'SPECIALIZATION · 12H',
+      learners: `${(26175 + index * 1240).toLocaleString('en-US')}`,
+      rating: `100% (${337 + index * 45})`,
+      pill: 'FREE WITH +PLUS',
+      discount: '99% Disc.',
+      originalPrice: '$97.99',
+      price: '$0.79',
     }));
   }, [course, lessons]);
 
@@ -189,7 +193,7 @@ export default function Courses() {
 
               <PageCarousel />
               <section className="space-y-10 md:pt-2">
-                <div className="grid gap-6 md:grid-cols-2 lg:gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-10">
                   {featuredLessons.map((lesson) => (
                     <CourseCard key={lesson.id} item={lesson} theme={theme} />
                   ))}

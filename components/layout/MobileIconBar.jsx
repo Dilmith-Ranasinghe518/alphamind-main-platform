@@ -3,13 +3,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { MAIN_SIDEBAR_NAV_SECTIONS } from './mainSidebarNav';
+import { QuestionMarkCircleIcon as HelpCircle } from '@heroicons/react/24/solid';
 
 export default function MobileIconBar({ theme = 'light' }) {
   const pathname = usePathname();
   const isDark = theme === 'dark';
 
   // Extract all items into a single array for the horizontal bar
-  const items = MAIN_SIDEBAR_NAV_SECTIONS.flatMap(section => section.items);
+  const items = [
+    ...MAIN_SIDEBAR_NAV_SECTIONS.flatMap(section => section.items),
+    { icon: HelpCircle, label: 'Help', href: '#help' }
+  ];
 
   const bgClass = isDark ? 'bg-slate-950 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900';
   const iconFilter = isDark ? 'brightness-0 invert' : 'brightness-0';

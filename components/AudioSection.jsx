@@ -29,7 +29,7 @@ export default function AudioSection({ movieShelf }) {
 
   const handleScroll = (e) => {
     const container = e.currentTarget;
-    const cardWidthWithGap = 122; // 110px width + 12px gap
+    const cardWidthWithGap = 137; // 125px width + 12px gap
     const index = Math.min(
       movies.length - 1,
       Math.max(0, Math.round(container.scrollLeft / cardWidthWithGap))
@@ -82,8 +82,8 @@ export default function AudioSection({ movieShelf }) {
               key={`${movie.title}-${index}`}
               className={`relative shrink-0 overflow-hidden rounded-[15px] bg-[#edf1f5] shadow-[0_24px_40px_rgba(15,23,42,0.16)] ring-1 ring-black/5 transition-all duration-300 ${
                 isFirstInMobileView
-                  ? 'h-[260px] w-[165px] min-w-[165px] sm:h-[400px] sm:w-[250px] sm:min-w-[250px]'
-                  : 'h-[200px] w-[110px] min-w-[110px] sm:h-[400px] sm:w-[250px] sm:min-w-[250px]'
+                  ? 'h-[210px] w-[140px] min-w-[140px] sm:h-[400px] sm:w-[250px] sm:min-w-[250px]'
+                  : 'h-[188px] w-[125px] min-w-[125px] sm:h-[400px] sm:w-[250px] sm:min-w-[250px]'
               }`}
             >
               <Image

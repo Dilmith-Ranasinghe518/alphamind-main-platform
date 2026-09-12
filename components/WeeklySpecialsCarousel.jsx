@@ -47,19 +47,19 @@ const defaultItems = [
 
 function WeeklySpecialsCard({ item }) {
   return (
-    <article className="mt-4 sm:mt-10 group relative h-full w-full aspect-[2/3] overflow-hidden rounded-[10px] bg-black/15 shadow-[0_20px_40px_rgba(0,0,0,0.24)] ring-1 ring-white/10">
+    <article className="mt-0 sm:mt-10 group relative h-full w-full aspect-[2/3] overflow-hidden rounded-[10px] bg-black/15 shadow-[0_20px_40px_rgba(0,0,0,0.24)] ring-1 ring-white/10">
       <img
         src={item.src}
         alt={item.title}
         className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
       />
       <div className="absolute inset-0 rounded-[10px] bg-[linear-gradient(180deg,rgba(8,8,12,0)_0%,rgba(8,8,12,0.06)_42%,rgba(11,10,18,0.36)_62%,rgba(10,10,16,0.72)_80%,rgba(8,8,12,0.96)_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 h-[40%] rounded-b-[10px] bg-[linear-gradient(180deg,rgba(54,38,83,0)_0%,rgba(54,38,83,0.1)_30%,rgba(18,14,28,0.4)_68%,rgba(8,8,12,0.72)_100%)]" />
-      <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end rounded-b-[10px] p-2 pb-4 sm:px-3 sm:pb-12 sm:pt-8">
-        <p className="line-clamp-2 text-[10px] sm:text-sm font-medium leading-snug text-white drop-shadow-md">
+      <div className="absolute inset-x-0 bottom-0 h-[55%] sm:h-[40%] rounded-b-[10px] bg-[linear-gradient(180deg,rgba(54,38,83,0)_0%,rgba(54,38,83,0.1)_30%,rgba(18,14,28,0.4)_68%,rgba(8,8,12,0.72)_100%)]" />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end rounded-b-[10px] p-1.5 pb-2 sm:px-3 sm:pb-12 sm:pt-8">
+        <p className="line-clamp-2 text-[10px] sm:text-sm font-medium leading-tight sm:leading-snug text-white drop-shadow-md">
           {item.title}
         </p>
-        <div className="mt-1 flex flex-col items-start sm:items-end gap-1 sm:gap-1.5">
+        <div className="mt-1 flex flex-col items-start sm:items-end gap-0.5 sm:gap-1.5">
           <div className="inline-flex max-w-full truncate rounded-[3px] bg-[#d9ff3f] px-1 sm:px-2 py-0.5 sm:py-1 text-[8px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-sm">
             {item.badge}
           </div>
@@ -120,9 +120,9 @@ export default function WeeklySpecialsCarousel({ items = defaultItems }) {
   }, [syncSwiper]);
 
   return (
-    <section className="relative rounded-[10px] px-6 pt-8 pb-2 sm:px-7 sm:pt-9 sm:pb-4 text-white lg:bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] lg:shadow-[0_30px_60px_rgba(15,23,42,0.28)] lg:overflow-hidden">
-      {/* Mobile background element that covers only the top portion */}
-      <div className="absolute inset-x-0 top-0 h-[65%] rounded-[10px] bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] shadow-[0_20px_40px_rgba(15,23,42,0.28)] lg:hidden">
+    <section className="relative rounded-[10px] px-6 pt-5 pb-2 sm:px-7 sm:pt-9 sm:pb-4 text-white lg:bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] lg:shadow-[0_30px_60px_rgba(15,23,42,0.28)] lg:overflow-hidden">
+      {/* Mobile panel: stops part-way down the poster strip so the cards hang out below it */}
+      <div className="absolute inset-x-0 top-0 h-[75%] rounded-[10px] bg-[radial-gradient(circle_at_18%_28%,rgba(87,94,214,0.18),transparent_24%),radial-gradient(circle_at_76%_18%,rgba(108,52,193,0.28),transparent_28%),linear-gradient(120deg,#06070b_0%,#0d101b_36%,#23124a_100%)] shadow-[0_20px_40px_rgba(15,23,42,0.28)] lg:hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,255,255,0.05),transparent_22%)] rounded-[10px]" />
       </div>
       
@@ -130,25 +130,25 @@ export default function WeeklySpecialsCarousel({ items = defaultItems }) {
       <div className="hidden lg:block pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_55%_50%,rgba(255,255,255,0.05),transparent_22%)]" />
 
       <div className="relative z-10 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(220px,0.82fr)_minmax(0,1.28fr)] lg:gap-6 lg:items-center">
-        <div className="min-w-0 space-y-4 pr-2">
-          <div className="space-y-2">
-            <h1 className="text-[1.9rem] font-medium leading-tight sm:text-[2.1rem]">
+        <div className="min-w-0 space-y-2.5 pr-2 sm:space-y-4">
+          <div className="space-y-1.5 sm:space-y-2">
+            <h1 className="text-xl font-medium leading-tight sm:text-[2.1rem]">
               Weekly specials: $4.99 movies
             </h1>
-            <p className="max-w-[28ch] text-sm leading-6 text-white/70">
+            <p className="max-w-[28ch] text-xs leading-5 text-white/70 sm:text-sm sm:leading-6">
               New top deals refreshed every Tuesday
             </p>
           </div>
 
           <button
             type="button"
-            className="inline-flex items-center rounded-[4px] bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/16"
+            className="inline-flex items-center rounded-[4px] bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/16 sm:px-4 sm:py-2 sm:text-sm"
           >
             See all
           </button>
         </div>
 
-        <div ref={containerRef} className="relative w-full min-w-0 py-3 pl-0 lg:py-4 lg:pl-3">
+        <div ref={containerRef} className="relative -mx-6 -mt-2 w-auto min-w-0 py-0 pl-0 sm:mx-0 sm:mt-0 sm:w-full sm:py-3 lg:py-4 lg:pl-3">
           <div className="absolute right-3 top-2 z-20 hidden items-center gap-2 sm:flex">
             <button
               type="button"
@@ -183,8 +183,8 @@ export default function WeeklySpecialsCarousel({ items = defaultItems }) {
                දෙක නිසා window එක 1440 උනත් මේ column එක 520px විතරයි. */
             breakpointsBase="container"
             breakpoints={{
-              0: { slidesPerView: 3.25, spaceBetween: 8 },
-              420: { slidesPerView: 3.25, spaceBetween: 12 },
+              0: { slidesPerView: 4, spaceBetween: 8 },
+              420: { slidesPerView: 4, spaceBetween: 10 },
               640: { slidesPerView: 4, spaceBetween: 14 },
             }}
           >

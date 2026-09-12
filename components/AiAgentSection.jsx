@@ -74,8 +74,8 @@ function ImageCarousel({
       : {
           0: { slidesPerView: 4, spaceBetween: 8 },
           480: { slidesPerView: 4, spaceBetween: 10 },
-          640: { slidesPerView: 4, spaceBetween: 18 },
-          768: { slidesPerView: 5, spaceBetween: 20 },
+          640: { slidesPerView: 4.5, spaceBetween: 14 },
+          768: { slidesPerView: 4.5, spaceBetween: 18 },
           1024: { slidesPerView: 5, spaceBetween: 22 },
         };
 
@@ -102,8 +102,8 @@ function ImageCarousel({
       <Swiper
         // !overflow-visible (mobile overlap සඳහා) සහ flex stretch වීම වැලැක්වීම
         className={`liquid-swiper !px-0 !overflow-visible lg:!overflow-hidden ${isAppStore ? 'appstore-swiper' : ''}`}
-        spaceBetween={isAppStore ? 12 : 16}
-        slidesPerView={isQCHome ? 1.2 : isAppStore ? 1.7 : 4}
+        spaceBetween={isAppStore ? 12 : 8}
+        slidesPerView={isQCHome ? 1.2 : isAppStore ? 1.7 : 3.8}
         grabCursor
         navigation={{
           nextEl: `.${nextClass}`,
@@ -168,21 +168,21 @@ function ImageCarousel({
                 ) : (
                   <>
                     <div className="absolute inset-0 rounded-[10px] backdrop-blur-2xl" />
-                    <div className="absolute inset-0 overflow-hidden rounded-[10px]">
-                      <img src={image.src} alt={title} className="h-full w-full object-cover" />
+                    <div className="absolute inset-0 overflow-hidden rounded-[10px] bg-black">
+                      <img src={image.src} alt={title} className="h-full w-full object-cover opacity-95" />
                       <div className={`pointer-events-none absolute inset-0 bg-gradient-to-t ${overlayGradient}`} />
                       <div className="pointer-events-none absolute inset-0 bg-white/5 blur-3xl opacity-50" />
                     </div>
-                    <div className="relative z-10 flex w-full flex-col gap-3 px-4 pb-4 text-white">
-                      <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] drop-shadow">
+                    <div className="relative z-10 flex w-full flex-col gap-3 px-2 pb-2 text-white sm:px-3 sm:pb-3">
+                      <div className="hidden lg:flex items-center justify-between text-xs uppercase tracking-[0.3em] drop-shadow">
                         <span>Gallery</span>
                         <span>{`#${imageId.toString().padStart(2, '0')}`}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${labelClasses}`}>{title}</span>
-                        {image.duration && <span className={`text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{image.duration}</span>}
+                        <span className={`inline-flex items-center whitespace-nowrap sm:whitespace-normal rounded-full px-1.5 sm:px-2.5 py-0.5 text-[9px] sm:text-[10px] lg:text-xs font-semibold ${labelClasses}`}>{title}</span>
+                        {image.duration && <span className={`text-[10px] lg:text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{image.duration}</span>}
                       </div>
-                      {image.subtitle && <p className={`text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{image.subtitle}</p>}
+                      {image.subtitle && <p className={`hidden lg:block text-xs ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{image.subtitle}</p>}
                     </div>
                   </>
                 )}
@@ -197,7 +197,7 @@ function ImageCarousel({
           border-radius: 10px;
           overflow: hidden;
           display: flex;
-          justify-content: start;
+          justify-content: flex-start;
         }
         /* Stretch issue fix */
         .liquid-swiper.swiper-autoheight .swiper-wrapper {
@@ -220,25 +220,25 @@ export default function AiAgentSection({ carouselItems = defaultImages, theme = 
   const router = useRouter();
 
   return (
-    <div className="w-full flex flex-col items-center py-6 lg:py-10 bg-zinc-200 px-3 sm:px-8 rounded-2xl overflow-hidden">
+    <div className="w-full flex flex-col items-center py-4 sm:py-6 lg:py-10 bg-zinc-200 px-2.5 sm:px-8 rounded-2xl overflow-hidden">
       
       {/* 1. Guarantee Banner Area */}
-      <div className="flex items-center w-full lg:max-w-[62vw] rounded-[20px] lg:rounded-[25px] bg-white px-6 py-8 pb-8 lg:pb-14 sm:px-10 lg:px-20 lg:py-14 text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
+      <div className="flex items-center w-full lg:max-w-[62vw] rounded-[20px] lg:rounded-[25px] bg-white px-5 py-6 sm:px-10 lg:px-20 lg:py-14 text-slate-900 shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
         
         {/* Mobile View Content (< lg) */}
-        <div className="flex flex-col items-start space-y-4 w-full lg:hidden">
-          <h3 className="text-[24px] sm:text-[28px] font-bold leading-[1.2] tracking-[-0.02em] text-slate-950">
+        <div className="flex flex-col items-start space-y-3.5 w-full lg:hidden">
+          <h3 className="text-[24px] sm:text-[28px] font-bold leading-[1.18] tracking-tight text-slate-950">
             learn-with-your-ai agent
             <br />
             accurately
           </h3>
-          <p className="text-[13px] leading-[1.6] text-slate-600 max-w-[340px]">
+          <p className="text-[12px] sm:text-[13px] leading-[1.55] text-slate-700 font-medium max-w-[340px]">
             Quantum Mind is an innovative AI-powered education platform dedicated to transforming the way students learn, practice, and succeed.
           </p>
           <button
             type="button"
             onClick={() => router.push('/qchome/qchomepage1')}
-            className="mt-2 inline-flex items-center justify-center rounded-full bg-[#f98b11] px-7 py-3.5 text-[11px] font-bold uppercase tracking-wider text-white shadow-[0_4px_14px_rgba(249,139,17,0.35)] transition hover:bg-[#e07b0a] active:scale-[0.98]"
+            className="mt-1 inline-flex items-center justify-center rounded-full bg-[#f59e0b] px-6 py-3 text-[11px] font-extrabold uppercase tracking-wider text-slate-950 shadow-sm transition hover:bg-[#ea580c] active:scale-[0.98]"
           >
             EXPLORE ALL PROGRAMMES
           </button>
@@ -274,8 +274,8 @@ export default function AiAgentSection({ carouselItems = defaultImages, theme = 
       </div>
 
       {/* 2. Image Carousel Segment */}
-      <div className="w-full relative z-10 mt-6 lg:mt-10 px-4 sm:px-0">
-        <ImageCarousel items={carouselItems} theme={theme} variant={variant} cardHeightClass="h-[320px]" />
+      <div className="relative z-10 -mx-2.5 -mb-4 mt-4 w-[calc(100%+1.25rem)] px-0 sm:mx-0 sm:mb-0 sm:mt-6 sm:w-full lg:mt-10">
+        <ImageCarousel items={carouselItems} theme={theme} variant={variant} cardHeightClass="h-[180px] sm:h-[240px] lg:h-[320px]" />
       </div>
 
     </div>

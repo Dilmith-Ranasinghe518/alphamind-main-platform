@@ -142,17 +142,27 @@ export default function SidebarNavContent({
               </ul>
             </div>
           ))}
+          {/* Mobile-only Help icon inside the horizontal swipe container */}
+          <div className="flex lg:hidden items-center flex-shrink-0">
+            <button
+              type="button"
+              aria-label="Help"
+              className={`flex items-center justify-center rounded-md p-2 transition-colors duration-200 ${idleClasses}`}
+            >
+              <HelpCircle className={`h-6 w-6 flex-shrink-0 ${iconIdleClasses}`} />
+            </button>
+          </div>
         </div>
       </nav>
-      <div className={`flex-shrink-0 border-l lg:border-l-0 lg:border-t ${footerBorder} px-2 py-2 lg:px-3 lg:py-4 ${collapsed ? 'lg:py-3 lg:px-3' : ''}`}>
+      <div className={`hidden lg:flex flex-shrink-0 border-t ${footerBorder} px-3 py-4 ${collapsed ? 'py-3 px-3' : ''}`}>
         <button
           type="button"
           className={`flex w-full items-center justify-center lg:justify-start gap-2 rounded-md px-3 py-2 text-sm transition-colors duration-200 ${footerButtonClasses}`}
         >
           <HelpCircle className={`h-6 w-6 flex-shrink-0 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
           <span
-            className={`min-w-0 overflow-hidden whitespace-nowrap text-left transition-all duration-200 w-auto opacity-100 ${
-              collapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto lg:opacity-100'
+            className={`min-w-0 overflow-hidden whitespace-nowrap text-left transition-all duration-200 ${
+              collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
             }`}
           >
             Help
