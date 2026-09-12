@@ -145,14 +145,15 @@ export default function Browser() {
                 Open contents
               </button>
 
+              
+
+              <HeroCarousel />
               <MobileContentsDropdown
                 course={course}
                 currentLessonId={currentLessonId as any}
                 setCurrentLessonId={setCurrentLessonId as any}
                 isDark={isDark}
               />
-
-              <HeroCarousel />
 
               <div className="flex flex-col items-center justify-center w-full mb-20">
                 {/* 1. Amber Box */}
