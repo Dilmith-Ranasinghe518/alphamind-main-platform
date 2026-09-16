@@ -143,14 +143,14 @@ export default function ShortNote() {
                 Open contents
               </button>
 
+              <HeroCarousel />
+
               <MobileContentsDropdown
                 course={course}
                 currentLessonId={currentLessonId as any}
                 setCurrentLessonId={setCurrentLessonId as any}
                 isDark={isDark}
               />
-
-              <HeroCarousel />
 
               <ShortnoteSection />
               <ShortnoteSection />

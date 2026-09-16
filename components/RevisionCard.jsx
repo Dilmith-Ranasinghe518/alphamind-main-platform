@@ -46,8 +46,8 @@ export default function RevisionCard({ lessons = [] }) {
   }, [lessons]);
 
   return (
-    <section className="rounded-[15px] bg-[#c4c4c4] pb-30 shadow-[0_22px_70px_rgba(15,23,42,0.12)] lg:rounded-[15px] mt-10">
-      <div className="relative rounded-t-[15px] bg-[#050505] px-4 pb-28 pt-10 text-white sm:px-6 lg:px-8 lg:pb-36 lg:pt-7">
+    <section className="rounded-[15px] bg-[#c4c4c4] pb-32 xs:pb-28 sm:pb-32 lg:pb-36 shadow-[0_22px_70px_rgba(15,23,42,0.12)] lg:rounded-[15px] mt-6 sm:mt-10">
+      <div className="relative rounded-t-[15px] bg-[#050505] px-3.5 sm:px-6 lg:px-8 pb-32 sm:pb-36 pt-8 sm:pt-10 text-white lg:pb-36 lg:pt-7">
         {/* Abstract Background Decorations */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,_rgba(143,120,255,0.2),_transparent_55%)]" />
@@ -56,8 +56,8 @@ export default function RevisionCard({ lessons = [] }) {
         </div>
 
         <div className="relative z-10">
-          <div className="mb-8 text-center">
-            <h2 className="text-[28px] font-light tracking-[-0.04em] text-white sm:text-[34px]">
+          <div className="mb-6 sm:mb-8 text-center">
+            <h2 className="text-[22px] xs:text-[26px] sm:text-[34px] font-light tracking-[-0.04em] text-white">
               Ready for your next move?
             </h2>
           </div>
@@ -92,31 +92,41 @@ export default function RevisionCard({ lessons = [] }) {
               {programCards.map((lesson) => (
                 <SwiperSlide key={lesson.id} className="!h-auto py-2">
                   {/* Mobile View Card (< sm) */}
-                  <article className="sm:hidden mx-auto w-full max-w-[320px] overflow-hidden rounded-[20px] border border-zinc-800 bg-black p-5 flex flex-col items-center text-center shadow-2xl space-y-4">
-                    <div className="relative h-[180px] w-full overflow-hidden rounded-[14px]">
+                  <article className="sm:hidden w-full overflow-hidden rounded-[20px] border border-zinc-800 bg-black p-5 flex flex-col items-center text-center shadow-2xl space-y-4">
+                    <div className="relative h-[180px] xs:h-[210px] w-full overflow-hidden rounded-[14px]">
                       <img
                         src={lesson.image}
                         alt={lesson.title}
                         className="h-full w-full object-cover"
                       />
+                      {lesson.eyebrow && (
+                        <div className="absolute left-1/2 top-3 -translate-x-1/2 rounded-full border border-[#6e6a58] bg-[#1e1e1e]/90 px-3.5 py-1 text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#d7d29a] backdrop-blur">
+                          {lesson.eyebrow}
+                        </div>
+                      )}
                     </div>
-                    <div className="flex flex-col items-center space-y-2 pt-1">
-                      <h3 className="text-[20px] font-bold text-white leading-tight">
-                        Science development programme
+                    <div className="flex flex-col items-center space-y-2.5 pt-1 w-full">
+                      <h3 className="text-[18px] xs:text-[20px] font-bold text-white leading-tight">
+                        {lesson.title}
                       </h3>
-                      <p className="text-[12px] text-white/70 font-medium">
-                        300+ students reviews
+                      {lesson.meta && (
+                        <div className="flex items-center justify-center gap-1 text-[11px] text-[#d7d26f]">
+                          <StarIcon className="h-3.5 w-3.5" />
+                          <StarIcon className="h-3.5 w-3.5" />
+                          <StarIcon className="h-3.5 w-3.5" />
+                          <span className="ml-1 text-white/60 font-medium">{lesson.meta}</span>
+                        </div>
+                      )}
+                      <p className="text-[11.5px] leading-[1.6] text-white/65 max-w-[90%] line-clamp-3">
+                        {lesson.description}
                       </p>
-                      <p className="text-[11px] leading-[1.65] text-white/65 max-w-[275px]">
-                        Quantum Mind is an innovative AI-powered education platform dedicated to transforming the way students learn, practice, and succeed. Designed for the Sri Lankan syllabus, it offers intelligent learning support, interactive exams, personalized guidance,
-                      </p>
-                      <div className="pt-3 w-full flex justify-center">
+                      <div className="pt-2 w-full flex justify-center">
                         <button
                           type="button"
                           onClick={() => router.push('/courses')}
-                          className="w-full max-w-[220px] py-3 rounded-lg border-2 border-[#fa9418] bg-transparent text-[11px] font-bold uppercase tracking-wider text-white transition hover:bg-[#fa9418]/10 active:scale-[0.98]"
+                          className="w-full max-w-[260px] py-3 rounded-lg border-2 border-[#fa9418] bg-transparent text-[11px] font-bold uppercase tracking-wider text-white transition hover:bg-[#fa9418]/10 active:scale-[0.98]"
                         >
-                          LEARN MORE
+                          {lesson.cta || 'LEARN MORE'}
                         </button>
                       </div>
                     </div>
@@ -199,26 +209,26 @@ export default function RevisionCard({ lessons = [] }) {
         </div>
 
         {/* Money Back Guarantee Card */}
-        <div className="absolute inset-x-0 bottom-0 z-20 translate-y-1/2 px-4 sm:px-8 lg:px-16">
-          <div className="rounded-[24px] bg-white px-6 py-8 text-slate-900 shadow-[0_24px_48px_rgba(15,23,42,0.18)] sm:px-8 lg:grid lg:grid-cols-[1.15fr_0.95fr] lg:items-center lg:gap-10">
+        <div className="absolute inset-x-0 bottom-0 z-20 translate-y-1/2 px-3.5 sm:px-8 lg:px-16">
+          <div className="rounded-[20px] sm:rounded-[24px] bg-white p-5 xs:p-6 sm:px-8 sm:py-8 text-slate-900 shadow-[0_24px_48px_rgba(15,23,42,0.18)] lg:grid lg:grid-cols-[1.15fr_0.95fr] lg:items-center lg:gap-10">
             <div>
-              <h3 className="text-[30px] font-light leading-[1.04] tracking-[-0.04em] text-slate-900 sm:text-[38px]">
+              <h3 className="text-[22px] sm:text-[30px] lg:text-[38px] font-light leading-[1.1] sm:leading-[1.04] tracking-[-0.04em] text-slate-900">
                 15-day money-back
                 <br />
                 guarantee
               </h3>
-              <div className="mt-5 h-px w-full max-w-[280px] bg-slate-300 sm:mt-6 lg:max-w-[320px]" />
+              <div className="mt-3 sm:mt-5 h-px w-full max-w-[280px] bg-slate-300 sm:mt-6 lg:max-w-[320px]" />
             </div>
 
-            <div className="mt-6 lg:mt-0 lg:justify-self-end">
-              <p className="max-w-[360px] text-sm leading-6 text-slate-600 sm:text-[15px]">
+            <div className="mt-4 sm:mt-6 lg:mt-0 lg:justify-self-end">
+              <p className="max-w-[360px] text-xs sm:text-sm leading-relaxed text-slate-600 sm:text-[15px]">
                 All students are eligible for a full refund within 15 days of enrollment, no
                 questions asked.
               </p>
               <button
                 type="button"
                 onClick={() => router.push('/browse')}
-                className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#d1da70] bg-[#dff23a] px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-900 transition hover:bg-[#e5f85b]"
+                className="mt-4 sm:mt-5 w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-[#d1da70] bg-[#dff23a] px-5 sm:px-6 py-3 text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.18em] text-slate-900 transition hover:bg-[#e5f85b] active:scale-[0.98]"
               >
                 Explore all programs
                 <ArrowRightIcon className="h-3.5 w-3.5" />

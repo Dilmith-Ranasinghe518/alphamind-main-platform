@@ -171,8 +171,8 @@ export default function Research() {
               <JobSearchBanner />                    
               <JobCard />                    
 
-              <div className='bg-black h-[500px] rounded-2xl'>
-               <h1 className='text-white text-center'>Video</h1>
+              <div className="w-full bg-black aspect-video sm:aspect-auto sm:h-[400px] md:h-[500px] rounded-2xl flex items-center justify-center overflow-hidden">
+                <h1 className="text-white text-center text-lg sm:text-2xl font-bold">Video</h1>
               </div>
 
               <FAQSection />

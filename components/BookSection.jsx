@@ -22,7 +22,7 @@ const BookSection = ({
 }) => {
   return (
     <section className="w-full">
-      <div className="w-full rounded-2xl bg-zinc-200 dark:bg-slate-900 p-3.5 sm:p-5 lg:p-7 shadow-sm">
+      <div className="w-full rounded-2xl bg-zinc-200 dark:bg-slate-900 shadow-sm">
         <div className="grid grid-cols-[0.85fr_1.15fr] lg:grid-cols-[0.8fr_1.2fr] gap-2.5 sm:gap-5 lg:gap-7 items-stretch">
           
           {/* Left Side: Large Feature Poster / Card */}
@@ -81,7 +81,7 @@ const BookSection = ({
           </div>
 
           {/* Right Side: Header Info & Side-by-Side Cards */}
-          <div className="flex min-w-0 flex-col justify-between gap-2 py-0 sm:gap-6 sm:py-1">
+          <div className="flex min-w-0 flex-col justify-between gap-2 py-0 sm:gap-6 sm:py-1 py-3.5 sm:py-5 lg:py-7">
             {/* Header Content */}
             <div className="space-y-1 sm:space-y-2.5">
               <h2 className="text-sm sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-slate-950 dark:text-white leading-tight">
