@@ -447,7 +447,11 @@ export default function AdminPage() {
         setIsImportModalOpen(false);
         setImportJsxContent('');
         setImportedFileName('');
-        loadPageConfig(selectedSlug);
+        if (selectedSlug !== 'home') {
+          setSelectedSlug('home');
+        } else {
+          loadPageConfig('home');
+        }
         setTimeout(() => setSaveSuccessMsg(''), 4000);
       } else {
         alert(data.detail || 'Import failed');

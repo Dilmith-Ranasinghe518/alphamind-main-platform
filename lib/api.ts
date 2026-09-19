@@ -175,7 +175,104 @@ export async function uploadImage(file: File): Promise<string> {
   return data.url;
 }
 
+export function parseSubjectFromJsx(
+  jsxContent: string,
+  imageUrl: string = '/images/Poster12.jpg',
+  badgeColor: string = '#ec4899'
+): PageItem {
+  let varName = 'SubjectData';
+  const constMatch =
+    jsxContent.match(/export\s+const\s+(\w+)\s*=/m) ||
+    jsxContent.match(/(?:const|var|let)\s+(\w+)\s*=/m);
+  if (constMatch) {
+    varName = constMatch[1];
+  }
+
+  let cleaned = jsxContent
+    .trim()
+    .replace(/^export\s+default\s+/m, 'return ')
+    .replace(/^export\s+const\s+\w+\s*=/m, 'return ')
+    .replace(/^(const|var|let)\s+\w+\s*=/m, 'return ')
+    .replace(/;\s*$/, '');
+
+  let rawData: any = null;
+  try {
+    rawData = new Function(cleaned)();
+  } catch (e) {
+    try {
+      const wrapped = `var __out; ${jsxContent
+        .replace(/export\s+const\s+\w+\s*=/m, '__out =')
+        .replace(/export\s+default\s+/, '__out =')}; return __out;`;
+      rawData = new Function(wrapped)();
+    } catch (e2: any) {
+      console.error('Failed to parse JSX subject object:', e2);
+      throw new Error(`Failed to parse JavaScript object: ${e2?.message || e2}`);
+    }
+  }
+
+  if (!rawData || typeof rawData !== 'object') {
+    throw new Error('Parsed subject data is empty or invalid.');
+  }
+
+  const rootKey = Object.keys(rawData)[0];
+  const root =
+    rootKey &&
+    rawData[rootKey] &&
+    typeof rawData[rootKey] === 'object' &&
+    ('title' in rawData[rootKey] || 'chapters' in rawData[rootKey])
+      ? rawData[rootKey]
+      : rawData;
+
+  const subjectTitle = root.title || varName;
+  const dropdownHeading =
+    (root.chapters && root.chapters[0] && root.chapters[0].dropdownHeading) ||
+    `${subjectTitle} Syllabus`;
+
+  const formattedChapters: ChapterItem[] = (root.chapters || []).map((ch: any, idx: number) => ({
+    id: 'ch-' + (ch.id || idx + 1),
+    title: ch.title || `Chapter ${idx + 1}`,
+    lessons: (ch.lessons || []).map((les: any, lIdx: number) => ({
+      id: 'les-' + (les.id || lIdx + 1),
+      title: les.title || `Lesson ${lIdx + 1}`,
+      duration: les.duration || '8m 00s',
+      completed: Boolean(les.completed),
+      videoUrl: les.videoUrl || '',
+      description:
+        les.description ||
+        (les.objectives
+          ? Array.isArray(les.objectives)
+            ? les.objectives.join(', ')
+            : String(les.objectives)
+          : ''),
+      ...(les.objectives ? { objectives: les.objectives } : {}),
+      ...(les.transcript ? { transcript: les.transcript } : {}),
+      ...(les.resources ? { resources: les.resources } : {}),
+      ...(les.studyMaterials ? { studyMaterials: les.studyMaterials } : {})
+    }))
+  }));
+
+  const subjectItem: PageItem = {
+    id: 'subj-' + varName.toLowerCase(),
+    title: subjectTitle,
+    subtitle: dropdownHeading,
+    description: `Complete syllabus and lessons for ${subjectTitle}`,
+    category: 'Syllabus',
+    imageUrl: imageUrl || '/images/Poster12.jpg',
+    badgeText: root.grade || 'Grade 7',
+    badgeColor: badgeColor || '#ec4899',
+    price: `${formattedChapters.length} Chapters`,
+    isVisible: true,
+    order: 1,
+    chapters: formattedChapters
+  };
+
+  return subjectItem;
+}
+
 export async function importSubjectJsx(jsxContent: string, imageUrl?: string, badgeColor?: string) {
+  // 1. Evaluate and format subject data directly in the client runtime
+  const subjectItem = parseSubjectFromJsx(jsxContent, imageUrl, badgeColor);
+
   let processedJsx = jsxContent.trim();
   const exportConstMatch = processedJsx.match(/^export\s+const\s+(\w+)\s*=/m);
   if (exportConstMatch) {
@@ -191,36 +288,89 @@ export async function importSubjectJsx(jsxContent: string, imageUrl?: string, ba
     }
   }
 
-  // Client-side evaluation to produce clean JSON structure
-  let parsedData: any = null;
+  // 2. Attempt backend endpoint (supplying parsed object to relieve server of Node requirement)
+  let backendSucceeded = false;
+  let backendResponse: any = null;
   try {
-    const evalCode = jsxContent.trim()
-      .replace(/^export\s+const\s+\w+\s*=/m, 'return')
-      .replace(/^export\s+default\s+/m, 'return')
-      .replace(/^(const|var|let)\s+\w+\s*=/m, 'return')
-      .replace(/;\s*$/, '');
-    parsedData = new Function(evalCode)();
-  } catch (e) {
-    console.warn('Client-side JS object parsing notice:', e);
+    const res = await fetch(`${API_BASE_URL}/import-subject`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsxContent: processedJsx,
+        rawJsxContent: jsxContent,
+        subjectItem,
+        parsedData: subjectItem,
+        jsonContent: JSON.stringify(subjectItem),
+        imageUrl: subjectItem.imageUrl,
+        badgeColor: subjectItem.badgeColor
+      }),
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.success) {
+      backendSucceeded = true;
+      backendResponse = data;
+    } else {
+      console.warn('Backend /import-subject did not complete successfully, using direct home sync fallback:', data);
+    }
+  } catch (err) {
+    console.warn('Network call to /import-subject failed, using direct home sync fallback:', err);
   }
 
-  const res = await fetch(`${API_BASE_URL}/import-subject`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      jsxContent: processedJsx,
-      rawJsxContent: jsxContent,
-      parsedData,
-      jsonContent: parsedData ? JSON.stringify(parsedData) : null,
-      imageUrl,
-      badgeColor
-    }),
-  });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.detail || 'Import failed');
+  if (backendSucceeded && backendResponse) {
+    return backendResponse;
   }
-  return data;
+
+  // 3. Fallback: Save directly to the Home page configuration in MongoDB
+  const homeConfig = await fetchPageConfig('home');
+  const baseConfig: PageConfig = homeConfig || {
+    slug: 'home',
+    title: 'Main Platform Hub',
+    subtitle: 'Explore subjects, live tools, AI agents, research, and interactive learning modules.',
+    heroSlides: [],
+    sections: [],
+    isPublished: true
+  };
+
+  const sections = [...(baseConfig.sections || [])];
+  let carouselSec = sections.find(
+    (s) => s.id === 'sec-subjects-carousel' || s.title?.toLowerCase().includes('subject')
+  );
+
+  if (!carouselSec) {
+    if (sections.length > 0) {
+      carouselSec = sections[0];
+    } else {
+      carouselSec = {
+        id: 'sec-subjects-carousel',
+        title: 'Subject Carousels & Learning Modules',
+        subtitle: 'Click any subject to view its full course contents in the left sidebar',
+        isVisible: true,
+        items: []
+      };
+      sections.push(carouselSec);
+    }
+  }
+
+  const items = [...(carouselSec.items || [])];
+  const existingIdx = items.findIndex((it) => it.id === subjectItem.id);
+  if (existingIdx >= 0) {
+    items[existingIdx] = subjectItem;
+  } else {
+    items.unshift(subjectItem);
+  }
+  carouselSec.items = items;
+
+  await savePageConfig('home', {
+    ...baseConfig,
+    sections
+  });
+
+  return {
+    success: true,
+    message: `Successfully imported subject '${subjectItem.title}' into Database!`,
+    data: subjectItem
+  };
 }
+
 
 
