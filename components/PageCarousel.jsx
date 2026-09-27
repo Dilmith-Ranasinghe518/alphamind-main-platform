@@ -67,7 +67,7 @@ function CarouselCard({ item, accent = 'amber' }) {
       />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(9,10,15,0)_0%,rgba(9,10,15,0.08)_46%,rgba(11,12,18,0.58)_76%,rgba(8,8,12,0.9)_100%)]" />
       <div className="absolute inset-x-2 bottom-2 rounded-[8px] bg-[linear-gradient(180deg,rgba(32,34,42,0.12),rgba(11,12,18,0.72))] px-2.5 pb-3 pt-2.5 backdrop-blur-[8px]">
-        <p className="truncate text-[11px] font-medium text-white">{item.title}</p>
+        <p className="truncate text-[11px] font-medium font-sinhala text-white">{item.title}</p>
         <div className="mt-2 flex flex-col items-start gap-1">
           <span className={`inline-flex rounded-[4px] px-2 py-1 text-[8px] font-bold uppercase tracking-[0.08em] ${badgeClass}`}>
             {item.badge}

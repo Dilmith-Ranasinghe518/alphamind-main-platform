@@ -48,7 +48,7 @@ function SubjectCard({ item, isSelected, onClick }: { item: PageItem; isSelected
       <div className="absolute inset-x-0 bottom-0 h-[38%] rounded-b-[14px] bg-[linear-gradient(180deg,rgba(54,38,83,0)_0%,rgba(54,38,83,0.1)_30%,rgba(18,14,28,0.4)_68%,rgba(8,8,12,0.85)_100%)]" />
       
       <div className="absolute inset-x-0 bottom-0 flex min-h-[122px] flex-col justify-end rounded-b-[14px] px-3.5 pb-4 pt-8">
-        <p className="line-clamp-2 min-h-[32px] text-sm font-bold leading-5 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.72)]">
+        <p className="line-clamp-2 min-h-[32px] text-sm font-bold font-sinhala leading-5 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.72)]">
           {item.title}
         </p>
         <div className="mt-1.5 flex flex-col items-end gap-1.5">

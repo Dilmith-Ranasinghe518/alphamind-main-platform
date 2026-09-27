@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Abhaya_Libre, Noto_Sans_Sinhala } from "next/font/google";
 import "./globals.css";
 import ScaleWrapper from "@/components/ScaleWrapper";
 
@@ -11,6 +11,20 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const abhayaLibre = Abhaya_Libre({
+  weight: ["400", "500", "600", "700", "800"],
+  subsets: ["sinhala", "latin"],
+  variable: "--font-abhaya",
+  display: "swap",
+});
+
+const notoSansSinhala = Noto_Sans_Sinhala({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["sinhala", "latin"],
+  variable: "--font-noto-sinhala",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${abhayaLibre.variable} ${notoSansSinhala.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <ScaleWrapper>{children}</ScaleWrapper>

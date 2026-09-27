@@ -1,3 +1,10 @@
+import {
+  convertTaggedFmToUnicode,
+  convertJsxToUnicode,
+  convertSubjectObjectToUnicode,
+  isFmSinhalaText
+} from './sinhalaConverter';
+
 function getApiBaseUrl(): string {
   const envUrl = process.env.NEXT_PUBLIC_MAIN_PLATFORM_API;
   if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
@@ -223,30 +230,32 @@ export function parseSubjectFromJsx(
       ? rawData[rootKey]
       : rawData;
 
-  const subjectTitle = root.title || varName;
-  const dropdownHeading =
+  const subjectTitle = convertTaggedFmToUnicode(root.title || varName);
+  const rawDropdownHeading =
     (root.chapters && root.chapters[0] && root.chapters[0].dropdownHeading) ||
     `${subjectTitle} Syllabus`;
+  const dropdownHeading = convertTaggedFmToUnicode(rawDropdownHeading);
 
   const formattedChapters: ChapterItem[] = (root.chapters || []).map((ch: any, idx: number) => ({
     id: 'ch-' + (ch.id || idx + 1),
-    title: ch.title || `Chapter ${idx + 1}`,
+    title: convertTaggedFmToUnicode(ch.title || `Chapter ${idx + 1}`),
     lessons: (ch.lessons || []).map((les: any, lIdx: number) => ({
       id: 'les-' + (les.id || lIdx + 1),
-      title: les.title || `Lesson ${lIdx + 1}`,
+      title: convertTaggedFmToUnicode(les.title || `Lesson ${lIdx + 1}`),
       duration: les.duration || '8m 00s',
       completed: Boolean(les.completed),
       videoUrl: les.videoUrl || '',
-      description:
+      description: convertTaggedFmToUnicode(
         les.description ||
         (les.objectives
           ? Array.isArray(les.objectives)
             ? les.objectives.join(', ')
             : String(les.objectives)
-          : ''),
-      ...(les.objectives ? { objectives: les.objectives } : {}),
-      ...(les.transcript ? { transcript: les.transcript } : {}),
-      ...(les.resources ? { resources: les.resources } : {}),
+          : '')
+      ),
+      ...(les.objectives ? { objectives: convertSubjectObjectToUnicode(les.objectives) } : {}),
+      ...(les.transcript ? { transcript: convertSubjectObjectToUnicode(les.transcript) } : {}),
+      ...(les.resources ? { resources: convertSubjectObjectToUnicode(les.resources) } : {}),
       ...(les.studyMaterials ? { studyMaterials: les.studyMaterials } : {})
     }))
   }));
@@ -255,7 +264,9 @@ export function parseSubjectFromJsx(
     id: 'subj-' + varName.toLowerCase(),
     title: subjectTitle,
     subtitle: dropdownHeading,
-    description: `Complete syllabus and lessons for ${subjectTitle}`,
+    description: convertTaggedFmToUnicode(
+      root.description || `Complete syllabus and lessons for ${subjectTitle}`
+    ),
     category: 'Syllabus',
     imageUrl: imageUrl || '/images/Poster12.jpg',
     badgeText: root.grade || 'Grade 7',
@@ -269,11 +280,21 @@ export function parseSubjectFromJsx(
   return subjectItem;
 }
 
-export async function importSubjectJsx(jsxContent: string, imageUrl?: string, badgeColor?: string) {
-  // 1. Evaluate and format subject data directly in the client runtime
-  const subjectItem = parseSubjectFromJsx(jsxContent, imageUrl, badgeColor);
+export async function importSubjectJsx(
+  jsxContent: string,
+  imageUrl?: string,
+  badgeColor?: string,
+  autoConvertUnicode: boolean = true
+) {
+  // If auto-convert is active and content has FM Sinhala, convert JSX content
+  const effectiveJsx = autoConvertUnicode && isFmSinhalaText(jsxContent)
+    ? convertJsxToUnicode(jsxContent)
+    : jsxContent;
 
-  let processedJsx = jsxContent.trim();
+  // 1. Evaluate and format subject data directly in the client runtime
+  const subjectItem = parseSubjectFromJsx(effectiveJsx, imageUrl, badgeColor);
+
+  let processedJsx = effectiveJsx.trim();
   const exportConstMatch = processedJsx.match(/^export\s+const\s+(\w+)\s*=/m);
   if (exportConstMatch) {
     const varName = exportConstMatch[1];

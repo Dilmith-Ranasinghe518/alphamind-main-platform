@@ -9,6 +9,7 @@ import {
   savePageConfig,
   uploadImage,
   importSubjectJsx,
+  parseSubjectFromJsx,
   PageConfig,
   PageSummary,
   PageSection,
@@ -17,6 +18,13 @@ import {
   LessonItem,
   HeroSlide
 } from '@/lib/api';
+
+import {
+  isFmSinhalaText,
+  convertJsxToUnicode,
+  convertTaggedFmToUnicode,
+  hasSinhalaUnicode
+} from '@/lib/sinhalaConverter';
 
 import {
   LockClosedIcon,
@@ -96,6 +104,57 @@ export default function AdminPage() {
   const [importBadgeColor, setImportBadgeColor] = useState<string>('#ec4899');
   const [isImporting, setIsImporting] = useState<boolean>(false);
 
+  // Sinhala FM-Abhaya to Unicode Conversion State
+  const [isSinhalaDetected, setIsSinhalaDetected] = useState<boolean>(false);
+  const [autoConvertSinhala, setAutoConvertSinhala] = useState<boolean>(true);
+  const [importModalTab, setImportModalTab] = useState<'preview' | 'code'>('preview');
+  const [parsedUnicodePreview, setParsedUnicodePreview] = useState<PageItem | null>(null);
+  const [rawOriginalJsx, setRawOriginalJsx] = useState<string>('');
+  const [isConvertedInEditor, setIsConvertedInEditor] = useState<boolean>(false);
+
+  const handleJsxContentUpdate = (content: string, fileName?: string) => {
+    setImportJsxContent(content);
+    const fname = fileName !== undefined ? fileName : importedFileName;
+    const detected = isFmSinhalaText(content, fname);
+    setIsSinhalaDetected(detected);
+
+    if (detected || hasSinhalaUnicode(content)) {
+      try {
+        const preview = parseSubjectFromJsx(content, importImageUrl, importBadgeColor);
+        setParsedUnicodePreview(preview);
+        setImportModalTab('preview');
+      } catch {
+        setParsedUnicodePreview(null);
+      }
+    } else {
+      setParsedUnicodePreview(null);
+    }
+  };
+
+  const handleToggleConvertEditorCode = () => {
+    if (isConvertedInEditor) {
+      if (rawOriginalJsx) {
+        setImportJsxContent(rawOriginalJsx);
+        setIsConvertedInEditor(false);
+        try {
+          const preview = parseSubjectFromJsx(rawOriginalJsx, importImageUrl, importBadgeColor);
+          setParsedUnicodePreview(preview);
+        } catch {}
+      }
+    } else {
+      if (!rawOriginalJsx) {
+        setRawOriginalJsx(importJsxContent);
+      }
+      const converted = convertJsxToUnicode(importJsxContent);
+      setImportJsxContent(converted);
+      setIsConvertedInEditor(true);
+      try {
+        const preview = parseSubjectFromJsx(converted, importImageUrl, importBadgeColor);
+        setParsedUnicodePreview(preview);
+      } catch {}
+    }
+  };
+
   const processFile = (file: File) => {
     if (!file) return;
     if (!file.name.endsWith('.jsx') && !file.name.endsWith('.js') && !file.name.endsWith('.txt')) {
@@ -107,7 +166,9 @@ export default function AdminPage() {
     reader.onload = (e) => {
       const text = e.target?.result;
       if (typeof text === 'string') {
-        setImportJsxContent(text);
+        setRawOriginalJsx(text);
+        setIsConvertedInEditor(false);
+        handleJsxContentUpdate(text, file.name);
       }
     };
     reader.readAsText(file);
@@ -441,12 +502,21 @@ export default function AdminPage() {
 
     setIsImporting(true);
     try {
-      const data = await importSubjectJsx(importJsxContent, importImageUrl, importBadgeColor);
+      const data = await importSubjectJsx(
+        importJsxContent,
+        importImageUrl,
+        importBadgeColor,
+        autoConvertSinhala
+      );
       if (data.success) {
-        setSaveSuccessMsg(data.message || 'Subject imported successfully!');
+        setSaveSuccessMsg(data.message || 'Subject imported successfully in Sinhala Unicode!');
         setIsImportModalOpen(false);
         setImportJsxContent('');
         setImportedFileName('');
+        setParsedUnicodePreview(null);
+        setIsSinhalaDetected(false);
+        setIsConvertedInEditor(false);
+        setRawOriginalJsx('');
         if (selectedSlug !== 'home') {
           setSelectedSlug('home');
         } else {
@@ -1299,7 +1369,7 @@ export default function AdminPage() {
                             type="text"
                             value={ch.title}
                             onChange={(e) => handleUpdateChapterTitle(ch.id, e.target.value)}
-                            className="flex-1 rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs font-semibold text-white focus:border-amber-500 focus:outline-none"
+                            className="flex-1 rounded-md border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs font-semibold font-sinhala text-white focus:border-amber-500 focus:outline-none"
                             placeholder="Chapter Title (e.g. Introduction)"
                           />
                         </div>
@@ -1332,7 +1402,7 @@ export default function AdminPage() {
                                 type="text"
                                 value={les.title}
                                 onChange={(e) => handleUpdateLesson(ch.id, les.id, 'title', e.target.value)}
-                                className="flex-1 rounded border border-slate-800 bg-slate-950 px-2 py-1 text-[11px] text-slate-200 focus:border-amber-500 focus:outline-none"
+                                className="flex-1 rounded border border-slate-800 bg-slate-950 px-2 py-1 text-[11px] font-sinhala text-slate-200 focus:border-amber-500 focus:outline-none"
                                 placeholder="Lesson title (e.g. What is Generative AI?)"
                               />
                               <input
@@ -1440,28 +1510,196 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* JSX CONTENT TEXTAREA */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-slate-300 font-semibold">JSX Subject Code *</label>
-                  {importJsxContent && (
-                    <button
-                      type="button"
-                      onClick={() => { setImportJsxContent(''); setImportedFileName(''); }}
-                      className="text-[11px] text-rose-400 hover:underline cursor-pointer"
-                    >
-                      Clear Content
-                    </button>
+              {/* SINHALA FM-ABHAYA DETECTION BANNER & CONTROLS */}
+              {isSinhalaDetected && (
+                <div className="rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-600/10 to-transparent p-3.5 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-2.5">
+                      <span className="text-2xl">🇱🇰</span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-amber-300 text-xs">Sinhala Subject Detected (FM-Abhaya Font Format)</span>
+                          <span className="rounded-full bg-amber-400/25 px-2 py-0.5 text-[10px] font-bold text-amber-200 uppercase tracking-wider">
+                            FM Abhaya → Unicode
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 mt-0.5">
+                          Legacy FM-Abhaya font encoding detected. Converted to standard Sinhala Unicode using <strong className="text-amber-300">FM Abhaya / Abhaya Libre</strong> typography.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-t border-amber-500/20 pt-2 text-[11px]">
+                    <div className="flex items-center gap-1 rounded-lg bg-slate-950/80 p-0.5 border border-slate-800">
+                      <button
+                        type="button"
+                        onClick={() => setImportModalTab('preview')}
+                        className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-semibold transition cursor-pointer ${
+                          importModalTab === 'preview'
+                            ? 'bg-amber-500 text-slate-950 shadow'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <EyeIcon className="h-3 w-3" />
+                        <span>Sinhala Unicode Preview</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImportModalTab('code')}
+                        className={`flex items-center gap-1.5 rounded-md px-3 py-1 font-semibold transition cursor-pointer ${
+                          importModalTab === 'code'
+                            ? 'bg-indigo-600 text-white shadow'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <DocumentTextIcon className="h-3 w-3" />
+                        <span>JSX Subject Code</span>
+                      </button>
+                    </div>
+
+                    <label className="flex items-center gap-2 text-amber-200 font-medium cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={autoConvertSinhala}
+                        onChange={(e) => setAutoConvertSinhala(e.target.checked)}
+                        className="rounded border-slate-700 bg-slate-950 text-amber-500 focus:ring-amber-500 cursor-pointer"
+                      />
+                      <span>Auto-convert to Unicode on Import</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 1: SINHALA UNICODE PREVIEW */}
+              {isSinhalaDetected && importModalTab === 'preview' ? (
+                <div className="space-y-3">
+                  {parsedUnicodePreview ? (
+                    <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 space-y-3">
+                      {/* Subject Banner */}
+                      <div className="flex items-start justify-between gap-3 border-b border-slate-800/80 pb-3">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                            Subject Title (Sinhala Unicode)
+                          </span>
+                          <h4 className="font-sinhala text-xl font-bold text-amber-300 leading-snug">
+                            {parsedUnicodePreview.title}
+                          </h4>
+                          {parsedUnicodePreview.subtitle && (
+                            <p className="font-sinhala text-xs text-slate-300">
+                              {parsedUnicodePreview.subtitle}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                          <span className="rounded-full bg-indigo-500/20 px-2.5 py-0.5 text-[10px] font-bold text-indigo-300 border border-indigo-500/30">
+                            {parsedUnicodePreview.badgeText || 'Grade 7'}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-medium">
+                            {parsedUnicodePreview.chapters?.length || 0} Chapters •{' '}
+                            {parsedUnicodePreview.chapters?.reduce((acc, c) => acc + (c.lessons?.length || 0), 0) || 0} Lessons
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Chapters & Lessons Preview List */}
+                      <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                        <div className="text-[11px] font-semibold text-slate-400 flex items-center justify-between">
+                          <span>Chapters & Lessons Hierarchy</span>
+                          <span className="text-amber-400 font-sinhala text-[10px]">Font: FM Abhaya / Abhaya Libre</span>
+                        </div>
+                        {(parsedUnicodePreview.chapters || []).map((ch, chIdx) => (
+                          <div key={ch.id} className="rounded-lg border border-slate-800/80 bg-slate-900/80 p-2.5 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/20">
+                                Ch {chIdx + 1}
+                              </span>
+                              <h5 className="font-sinhala font-bold text-xs text-white flex-1 truncate">
+                                {ch.title}
+                              </h5>
+                              <span className="text-[10px] text-slate-500">
+                                {ch.lessons?.length || 0} lessons
+                              </span>
+                            </div>
+
+                            <div className="space-y-1 pl-3 border-l-2 border-slate-800">
+                              {(ch.lessons || []).map((les, lIdx) => (
+                                <div key={les.id} className="flex items-center justify-between gap-2 text-[11px] text-slate-300 py-0.5">
+                                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                                    <span className="text-slate-500 text-[10px]">•</span>
+                                    <span className="font-sinhala truncate text-slate-200">
+                                      {les.title}
+                                    </span>
+                                  </div>
+                                  {les.duration && (
+                                    <span className="flex-shrink-0 text-[10px] text-slate-400 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
+                                      {les.duration}
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 text-center text-slate-400 text-xs">
+                      <p>Subject code is being parsed or contains syntax differences.</p>
+                      <button
+                        type="button"
+                        onClick={() => setImportModalTab('code')}
+                        className="mt-2 text-indigo-400 underline cursor-pointer"
+                      >
+                        Switch to JSX Subject Code to inspect
+                      </button>
+                    </div>
                   )}
                 </div>
-                <textarea
-                  rows={8}
-                  value={importJsxContent}
-                  onChange={(e) => setImportJsxContent(e.target.value)}
-                  placeholder="export const Catholicism7E = { 1: { title: 'Catholicism', chapters: [...] } };"
-                  className="w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-3 font-mono text-[11px] text-amber-300 focus:border-indigo-500 focus:outline-none"
-                />
-              </div>
+              ) : (
+                /* TAB 2: JSX CONTENT TEXTAREA */
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-slate-300 font-semibold">JSX Subject Code *</label>
+                    <div className="flex items-center gap-2">
+                      {isSinhalaDetected && (
+                        <button
+                          type="button"
+                          onClick={handleToggleConvertEditorCode}
+                          className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30 cursor-pointer transition"
+                        >
+                          {isConvertedInEditor ? '↩️ Revert to Raw FM Abhaya' : '✨ Convert Code to Sinhala Unicode'}
+                        </button>
+                      )}
+                      {importJsxContent && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setImportJsxContent('');
+                            setImportedFileName('');
+                            setParsedUnicodePreview(null);
+                            setIsSinhalaDetected(false);
+                            setRawOriginalJsx('');
+                            setIsConvertedInEditor(false);
+                          }}
+                          className="text-[11px] text-rose-400 hover:underline cursor-pointer"
+                        >
+                          Clear Content
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <textarea
+                    rows={8}
+                    value={importJsxContent}
+                    onChange={(e) => handleJsxContentUpdate(e.target.value)}
+                    placeholder="export const Catholicism7E = { 1: { title: 'Catholicism', chapters: [...] } };"
+                    className={`w-full rounded-xl border border-slate-800 bg-slate-950 px-3.5 py-3 font-mono text-[11px] text-amber-300 focus:border-indigo-500 focus:outline-none ${
+                      isConvertedInEditor ? 'font-sinhala' : ''
+                    }`}
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>

@@ -17,7 +17,7 @@ export default function MobileContentsDropdown({
     <div className="mt-4 lg:hidden px-2">
       <div className="relative">
         <select
-          className={`w-full appearance-none rounded-[8px] px-5 py-4 text-base font-medium outline-none transition-colors shadow-sm ${
+          className={`w-full appearance-none rounded-[8px] px-5 py-4 text-base font-medium font-sinhala outline-none transition-colors shadow-sm ${
             isDark
               ? 'bg-white/10 text-white border border-white/20'
               : 'bg-[#f4f4f4] text-gray-800 border border-transparent'

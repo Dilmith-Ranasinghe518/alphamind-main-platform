@@ -66,7 +66,7 @@ export default function ContentsSidebar({
         {course.chapters.map((chapter) => (
           <div key={chapter.id} className="mb-7">
             <div className={`flex items-center justify-between text-sm font-semibold ${chapterTitleClasses}`}>
-              <span>{chapter.title}</span>
+              <span className="font-sinhala">{chapter.title}</span>
             </div>
 
             <div className="mt-3 space-y-2">
@@ -87,7 +87,7 @@ export default function ContentsSidebar({
                     />
 
                     <div className="min-w-0 flex-1">
-                      <p className={`text-sm leading-5 ${isActive ? 'font-medium' : ''}`}>
+                      <p className={`text-sm leading-5 font-sinhala ${isActive ? 'font-medium' : ''}`}>
                         {lesson.title}
                       </p>
                       {durationLabel && <p className={`mt-0.5 text-xs ${durationClasses}`}>{durationLabel}</p>}
