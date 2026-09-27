@@ -30,7 +30,7 @@ export default function MobileContentsDropdown({
             <optgroup key={chapter.id} label={chapter.title}>
               {chapter.lessons?.map((lesson: any) => (
                 <option key={lesson.id} value={lesson.id}>
-                  {lesson.title}
+                  {lesson.lessonNumber ? `#${lesson.lessonNumber} - ` : ''}{lesson.title}
                 </option>
               ))}
             </optgroup>

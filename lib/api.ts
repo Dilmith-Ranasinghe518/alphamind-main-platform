@@ -24,6 +24,7 @@ export interface LessonItem {
   duration?: string;
   videoUrl?: string;
   completed?: boolean;
+  lessonNumber?: string | number;
 }
 
 export interface ChapterItem {
@@ -239,26 +240,35 @@ export function parseSubjectFromJsx(
   const formattedChapters: ChapterItem[] = (root.chapters || []).map((ch: any, idx: number) => ({
     id: 'ch-' + (ch.id || idx + 1),
     title: convertTaggedFmToUnicode(ch.title || `Chapter ${idx + 1}`),
-    lessons: (ch.lessons || []).map((les: any, lIdx: number) => ({
-      id: 'les-' + (les.id || lIdx + 1),
-      title: convertTaggedFmToUnicode(les.title || `Lesson ${lIdx + 1}`),
-      duration: les.duration || '8m 00s',
-      completed: Boolean(les.completed),
-      videoUrl: les.videoUrl || '',
-      description: convertTaggedFmToUnicode(
-        les.description ||
-        (les.objectives
-          ? Array.isArray(les.objectives)
-            ? les.objectives.join(', ')
-            : String(les.objectives)
-          : '')
-      ),
+    lessons: (ch.lessons || []).map((les: any, lIdx: number) => {
+      const rawLessonNum =
+        les.lessonNumber !== undefined
+          ? les.lessonNumber
+          : les.id !== undefined && !String(les.id).startsWith('les-')
+          ? les.id
+          : `${idx + 1}.${lIdx + 1}`;
+      return {
+        id: 'les-' + (les.id || lIdx + 1),
+        lessonNumber: rawLessonNum,
+        title: convertTaggedFmToUnicode(les.title || `Lesson ${lIdx + 1}`),
+        duration: les.duration || '8m 00s',
+        completed: Boolean(les.completed),
+        videoUrl: les.videoUrl || '',
+        description: convertTaggedFmToUnicode(
+          les.description ||
+          (les.objectives
+            ? Array.isArray(les.objectives)
+              ? les.objectives.join(', ')
+              : String(les.objectives)
+            : '')
+        ),
       ...(les.objectives ? { objectives: convertSubjectObjectToUnicode(les.objectives) } : {}),
       ...(les.transcript ? { transcript: convertSubjectObjectToUnicode(les.transcript) } : {}),
       ...(les.resources ? { resources: convertSubjectObjectToUnicode(les.resources) } : {}),
       ...(les.studyMaterials ? { studyMaterials: les.studyMaterials } : {})
-    }))
-  }));
+    };
+  })
+}));
 
   const subjectItem: PageItem = {
     id: 'subj-' + varName.toLowerCase(),

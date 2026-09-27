@@ -1396,30 +1396,41 @@ export default function AdminPage() {
                         {ch.lessons.length === 0 ? (
                           <div className="text-[11px] text-slate-500 italic">No lessons in this chapter yet.</div>
                         ) : (
-                          ch.lessons.map((les) => (
-                            <div key={les.id} className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                value={les.title}
-                                onChange={(e) => handleUpdateLesson(ch.id, les.id, 'title', e.target.value)}
-                                className="flex-1 rounded border border-slate-800 bg-slate-950 px-2 py-1 text-[11px] font-sinhala text-slate-200 focus:border-amber-500 focus:outline-none"
-                                placeholder="Lesson title (e.g. What is Generative AI?)"
-                              />
-                              <input
-                                type="text"
-                                value={les.duration || ''}
-                                onChange={(e) => handleUpdateLesson(ch.id, les.id, 'duration', e.target.value)}
-                                className="w-24 rounded border border-slate-800 bg-slate-950 px-2 py-1 text-[11px] text-slate-400 focus:border-amber-500 focus:outline-none"
-                                placeholder="5m 23s"
-                              />
-                              <button
-                                onClick={() => handleDeleteLesson(ch.id, les.id)}
-                                className="text-slate-500 hover:text-rose-400 p-1 cursor-pointer"
-                              >
-                                <TrashIcon className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))
+                          ch.lessons.map((les, lIdx) => {
+                            const lesNum =
+                              les.lessonNumber !== undefined && les.lessonNumber !== ''
+                                ? les.lessonNumber
+                                : les.id !== undefined && !String(les.id).startsWith('les-')
+                                ? les.id
+                                : `${chIdx + 1}.${lIdx + 1}`;
+                            return (
+                              <div key={les.id} className="flex items-center gap-2">
+                                <span className="flex-shrink-0 inline-flex items-center justify-center rounded bg-slate-800 px-1.5 py-1 text-[10px] font-mono font-bold text-amber-400 border border-slate-700 min-w-[28px]">
+                                  #{lesNum}
+                                </span>
+                                <input
+                                  type="text"
+                                  value={les.title}
+                                  onChange={(e) => handleUpdateLesson(ch.id, les.id, 'title', e.target.value)}
+                                  className="flex-1 rounded border border-slate-800 bg-slate-950 px-2 py-1 text-[11px] font-sinhala text-slate-200 focus:border-amber-500 focus:outline-none"
+                                  placeholder="Lesson title (e.g. What is Generative AI?)"
+                                />
+                                <input
+                                  type="text"
+                                  value={les.duration || ''}
+                                  onChange={(e) => handleUpdateLesson(ch.id, les.id, 'duration', e.target.value)}
+                                  className="w-24 rounded border border-slate-800 bg-slate-950 px-2 py-1 text-[11px] text-slate-400 focus:border-amber-500 focus:outline-none"
+                                  placeholder="5m 23s"
+                                />
+                                <button
+                                  onClick={() => handleDeleteLesson(ch.id, les.id)}
+                                  className="text-slate-500 hover:text-rose-400 p-1 cursor-pointer"
+                                >
+                                  <TrashIcon className="h-3 w-3" />
+                                </button>
+                              </div>
+                            );
+                          })
                         )}
                       </div>
 
@@ -1622,22 +1633,35 @@ export default function AdminPage() {
                               </span>
                             </div>
 
-                            <div className="space-y-1 pl-3 border-l-2 border-slate-800">
-                              {(ch.lessons || []).map((les, lIdx) => (
-                                <div key={les.id} className="flex items-center justify-between gap-2 text-[11px] text-slate-300 py-0.5">
-                                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                                    <span className="text-slate-500 text-[10px]">•</span>
-                                    <span className="font-sinhala truncate text-slate-200">
-                                      {les.title}
-                                    </span>
+                            <div className="space-y-1.5 pl-3 border-l-2 border-slate-800">
+                              {(ch.lessons || []).map((les, lIdx) => {
+                                const lessonNum =
+                                  les.lessonNumber !== undefined && les.lessonNumber !== ''
+                                    ? les.lessonNumber
+                                    : les.id !== undefined && !String(les.id).startsWith('les-')
+                                    ? les.id
+                                    : `${chIdx + 1}.${lIdx + 1}`;
+                                return (
+                                  <div
+                                    key={les.id}
+                                    className="flex items-center justify-between gap-2 text-[11px] text-slate-300 py-1 px-1.5 rounded-md bg-slate-950/40 hover:bg-slate-950/80 transition border border-slate-800/40"
+                                  >
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                      <span className="flex-shrink-0 inline-flex items-center justify-center rounded bg-indigo-500/20 px-1.5 py-0.5 text-[10px] font-mono font-bold text-indigo-300 border border-indigo-500/30">
+                                        Lesson {lessonNum}
+                                      </span>
+                                      <span className="font-sinhala truncate text-slate-200">
+                                        {les.title}
+                                      </span>
+                                    </div>
+                                    {les.duration && (
+                                      <span className="flex-shrink-0 text-[10px] text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+                                        {les.duration}
+                                      </span>
+                                    )}
                                   </div>
-                                  {les.duration && (
-                                    <span className="flex-shrink-0 text-[10px] text-slate-400 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
-                                      {les.duration}
-                                    </span>
-                                  )}
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         ))}

@@ -87,9 +87,16 @@ export default function ContentsSidebar({
                     />
 
                     <div className="min-w-0 flex-1">
-                      <p className={`text-sm leading-5 font-sinhala ${isActive ? 'font-medium' : ''}`}>
-                        {lesson.title}
-                      </p>
+                      <div className="flex items-start gap-1.5">
+                        {lesson.lessonNumber && (
+                          <span className="text-[10px] font-mono font-bold text-amber-400/90 flex-shrink-0 mt-0.5">
+                            #{lesson.lessonNumber}
+                          </span>
+                        )}
+                        <p className={`text-sm leading-5 font-sinhala ${isActive ? 'font-medium' : ''}`}>
+                          {lesson.title}
+                        </p>
+                      </div>
                       {durationLabel && <p className={`mt-0.5 text-xs ${durationClasses}`}>{durationLabel}</p>}
                     </div>
 

@@ -120,6 +120,7 @@ export default function Home() {
         title: ch.title,
         lessons: (ch.lessons || []).map((les, lesIdx) => ({
           id: les.id || `les-${chIdx}-${lesIdx}`,
+          lessonNumber: les.lessonNumber,
           title: les.title,
           duration: les.duration || '',
           completed: les.completed || false,
